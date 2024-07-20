@@ -1,15 +1,16 @@
 package myproject.cliposerver.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.jwt.JwtTokenUtil;
+import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.member.LoginRequestDTO;
-import myproject.cliposerver.data.dto.member.LoginResponseDTO;
-import myproject.cliposerver.data.dto.member.SignupRequestDTO;
+import myproject.cliposerver.data.dto.member.*;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.MemberRepository;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +55,7 @@ public class MemberService {
             throw new CustomException(ErrorCode.NOT_VALIDATE_USER);
         }
 
-        String accessToken = jwtTokenUtil.createToken(member);
+        String accessToken = jwtTokenUtil.createToken(member.getEmail(), member.getRole());
         String refreshToken = jwtTokenUtil.createRefreshToken();
 
         member.changeToken(accessToken, refreshToken);
@@ -82,6 +83,57 @@ public class MemberService {
 
         return ResponseDTO.builder()
                 .message("임시 비밀번호 발급")
+                .build();
+    }
+
+    @Transactional
+    public ResponseDTO recreateAccessToken(HttpServletRequest request) {
+        String refreshToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        Member member = memberRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_VALIDATE_TOKEN));
+
+        String accessToken = jwtTokenUtil.createToken(member.getEmail(), member.getRole());
+        member.changeAccessToken(accessToken);
+
+        return ResponseDTO.builder()
+                .message("토큰 재발급 완료")
+                .body(accessToken)
+                .build();
+    }
+
+    @Transactional
+    public ResponseDTO updateProfileNickname(UpdateProfileNicknameRequestDTO profileNicknameRequestDTO,
+                                             UserDetailsImpl userDetails){
+        Optional<Member> optionalUser = memberRepository.findByName(profileNicknameRequestDTO.getNickName());
+        if (optionalUser.isPresent()) {
+            throw new CustomException(ErrorCode.EXIST_NICKNAME);
+        }
+
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+        member.changeProfileImage(profileNicknameRequestDTO.getProfileImage());
+        member.changeName(profileNicknameRequestDTO.getNickName());
+
+        return ResponseDTO.builder()
+                .message("프로필 이미지 및 닉네임 변경 완료")
+                .build();
+    }
+
+    @Transactional
+    public ResponseDTO updatePassword(UpdatePasswordRequestDTO updatePasswordRequestDTO,
+                                      UserDetailsImpl userDetails) {
+
+        if (!passwordEncoder.matches(updatePasswordRequestDTO.getOldPassword(), userDetails.getMember().getPassword())) {
+            throw new CustomException(ErrorCode.NOT_EQUALS_PASSWORD);
+        }
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        member.changePassword(passwordEncoder.encode(updatePasswordRequestDTO.getNewPassword()));
+        memberRepository.save(member);
+        return ResponseDTO.builder()
+                .message("비밀번호 수정 완료")
                 .build();
     }
 

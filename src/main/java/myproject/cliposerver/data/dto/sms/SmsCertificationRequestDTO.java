@@ -1,4 +1,4 @@
-package myproject.cliposerver.data.dto.member;
+package myproject.cliposerver.data.dto.sms;
 
 import lombok.Getter;
 

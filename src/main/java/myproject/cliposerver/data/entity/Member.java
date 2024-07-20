@@ -21,7 +21,7 @@ public class Member extends BaseEntity {
     private String name;
     @Column(nullable = false)
     private String email;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
     @Column(nullable = false)
     private String phone;
@@ -61,5 +61,17 @@ public class Member extends BaseEntity {
     public void changeToken(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
+    }
+
+    public void changeAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

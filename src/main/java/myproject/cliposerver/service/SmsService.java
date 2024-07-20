@@ -2,7 +2,7 @@ package myproject.cliposerver.service;
 
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.member.SmsCertificationRequestDTO;
+import myproject.cliposerver.data.dto.sms.SmsCertificationRequestDTO;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
@@ -10,8 +10,6 @@ import myproject.cliposerver.repository.MemberRepository;
 import myproject.cliposerver.repository.SmsCertificationDao;
 import myproject.cliposerver.util.SmsUtil;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

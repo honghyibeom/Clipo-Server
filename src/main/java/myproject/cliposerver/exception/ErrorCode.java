@@ -11,6 +11,8 @@ public enum ErrorCode {
     NOT_EQUALS_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     SMS_CERTIFICATION_NUMBER_MISMATCH("인증번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     NOT_VALIDATE_USER("인증되지 않은 유저입니다.", HttpStatus.BAD_REQUEST),
+    NOT_VALIDATE_TOKEN("유효한 토큰이 아닙니다.", HttpStatus.BAD_REQUEST),
+    EXIST_NICKNAME("같은 닉네임이 존재 합니다.", HttpStatus.BAD_REQUEST),
     ALREADY_CHANGED_TOKEN("이미 재발급이 완료된 토큰입니다.",HttpStatus.UNAUTHORIZED),
     FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.\n다시 로그인 해주세요.",HttpStatus.UNAUTHORIZED);
 
