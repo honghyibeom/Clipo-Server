@@ -15,15 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 public class Member extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long mno;
-    @Column(nullable = true)
-    private String name;
-    @Column(nullable = false)
     private String email;
     @Column(nullable = true)
+    private String name;
+    @Column(nullable = true)
     private String password;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String phone;
     @Column(nullable = true)
     private String profileImage;
@@ -50,6 +47,13 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> replyList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardLike> boardLikeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReplyLike> replyLikeList = new ArrayList<>();
+
+
     public void changePassword(String password) {
         this.password = password;
     }
@@ -73,5 +77,9 @@ public class Member extends BaseEntity {
 
     public void changeProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
     }
 }

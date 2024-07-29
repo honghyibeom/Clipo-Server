@@ -1,9 +1,7 @@
 package myproject.cliposerver.data.dto.member;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.enumerate.Role;
 
@@ -17,14 +15,13 @@ public class SignupRequestDTO {
     @NotBlank(message = "email cannot be blank")
     private String email;
     private String password;
-    private String phone;
 
     public Member toEntity(){
         return Member.builder()
                 .email(email)
                 .password(password)
                 .name(null)
-                .phone(phone)
+                .phone(null)
                 .profileImage(null)
                 .isValidate(false)
                 .isSocial(false)

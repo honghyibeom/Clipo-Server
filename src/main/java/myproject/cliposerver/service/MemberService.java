@@ -55,7 +55,7 @@ public class MemberService {
             throw new CustomException(ErrorCode.NOT_VALIDATE_USER);
         }
 
-        String accessToken = jwtTokenUtil.createToken(member.getEmail(), member.getRole());
+        String accessToken = jwtTokenUtil.createToken(member);
         String refreshToken = jwtTokenUtil.createRefreshToken();
 
         member.changeToken(accessToken, refreshToken);
@@ -74,8 +74,8 @@ public class MemberService {
                 .build();
     }
     @Transactional
-    public ResponseDTO forgotPassword(String email) throws Exception {
-        Member member = getUser(email)
+    public ResponseDTO forgotPassword(String phone) throws Exception {
+        Member member = memberRepository.findByPhone(phone)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_USER));
         String code = mailService.sendSimpleMessage(member.getEmail());
         member.changePassword(code);
@@ -93,7 +93,7 @@ public class MemberService {
         Member member = memberRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_VALIDATE_TOKEN));
 
-        String accessToken = jwtTokenUtil.createToken(member.getEmail(), member.getRole());
+        String accessToken = jwtTokenUtil.createToken(member);
         member.changeAccessToken(accessToken);
 
         return ResponseDTO.builder()

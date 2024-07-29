@@ -1,4 +1,4 @@
-package myproject.cliposerver.data.dto.Oauth2;
+package myproject.cliposerver.data.dto.oAuth;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,6 +8,4 @@ import lombok.Getter;
 public class SocialLoginDTO {
     private String code;
     private String typeOfPlatform;
-
-
 }

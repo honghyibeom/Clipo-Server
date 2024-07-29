@@ -19,7 +19,6 @@ class MemberServiceTest {
         SignupRequestDTO.builder()
                 .email("ghdgmlqja1@naver.com")
                 .password("1234")
-                .phone("01042337306")
                 .build());
     }
 

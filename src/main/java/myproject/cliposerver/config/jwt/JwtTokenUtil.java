@@ -36,16 +36,16 @@ public class JwtTokenUtil {
     }
 
     //JWT Token 발급
-    public String createToken(String email, Role role) {
+    public String createToken(Member member) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
                         //"sub" 값에 id 값이 들어감.
-                        .subject(email)
+                        .subject(member.getEmail())
                         .expiration(new Date(date.getTime() + 60 * 60 * 1000L))
                         //"Authorization" 칸 안에 role 값이 들어감 (https://jwt.io/) 에서 토큰 decode 가능.
-                        .claim(AUTHORIZATION_KEY, role)
+                        .claim(AUTHORIZATION_KEY, member.getRole())
                         .issuedAt(date)
                         .signWith(secretKey)
                         .compact();

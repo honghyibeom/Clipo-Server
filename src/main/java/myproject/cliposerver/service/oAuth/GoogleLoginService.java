@@ -1,4 +1,4 @@
-package myproject.cliposerver.service.Oauth2;
+package myproject.cliposerver.service.oAuth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,10 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import myproject.cliposerver.config.jwt.JwtTokenUtil;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LoginResponseDTO;
-import myproject.cliposerver.data.dto.Oauth2.SocialLoginDTO;
-import myproject.cliposerver.data.dto.Oauth2.SocialUserInfoDTO;
+import myproject.cliposerver.data.dto.oAuth.SocialLoginDTO;
+import myproject.cliposerver.data.dto.oAuth.SocialUserInfoDTO;
 import myproject.cliposerver.data.entity.Member;
-import myproject.cliposerver.data.enumerate.Role;
 import myproject.cliposerver.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -26,11 +25,9 @@ import org.springframework.web.client.RestTemplate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-@Service
+@Service("google")
 @Slf4j
 @RequiredArgsConstructor
 public class GoogleLoginService implements SocialLoginInter {
@@ -56,37 +53,22 @@ public class GoogleLoginService implements SocialLoginInter {
 
         Optional<Member> existData = memberRepository.findByEmail(socialUserInfoDto.getEmail());
 
-        String createToken = jwtUtil.createToken(socialUserInfoDto.getEmail(), Role.USER);
-        String refreshToken = jwtUtil.createRefreshToken();
-
         Member member;
         if (existData.isEmpty()) {
-            member = socialUserInfoDto.toEntity();
+            member = socialUserInfoDto.toEntity(socialUserInfoDto);
+            String createToken = jwtUtil.createToken(member);
+            String refreshToken = jwtUtil.createRefreshToken();
             member.changeToken(createToken, refreshToken);
             memberRepository.save(member);
+            return getResponseDTO(createToken, refreshToken);
         }
         else {
+            String createToken = jwtUtil.createToken(existData.get());
+            String refreshToken = jwtUtil.createRefreshToken();
             existData.get().changeToken(createToken, refreshToken);
             memberRepository.save(existData.get());
+            return getResponseDTO(createToken, refreshToken);
         }
-
-        LoginResponseDTO responseDTO = LoginResponseDTO.builder()
-                .accessToken(createToken)
-                .refreshToken(refreshToken)
-                .validateTime(ZonedDateTime.now(ZoneId.of("UTC"))
-                        .plusHours(1L)
-                        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")))
-                .build();
-
-        // Map 을 사용하여 여러 데이터를 반환
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("loginResponse", responseDTO);
-        responseBody.put("socialUserInfo", socialUserInfoDto);
-
-        return ResponseDTO.builder()
-                .message("로그인 완료")
-                .body(responseBody)
-                .build();
     }
 
 
@@ -159,5 +141,20 @@ public class GoogleLoginService implements SocialLoginInter {
         log.info(profileImage);
 
         return new SocialUserInfoDTO(nickname, email, null, profileImage);
+    }
+
+    private static ResponseDTO getResponseDTO(String createToken, String refreshToken) {
+        LoginResponseDTO responseDTO = LoginResponseDTO.builder()
+                .accessToken(createToken)
+                .refreshToken(refreshToken)
+                .validateTime(ZonedDateTime.now(ZoneId.of("UTC"))
+                        .plusHours(1L)
+                        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")))
+                .build();
+
+        return ResponseDTO.builder()
+                .message("로그인 완료")
+                .body(responseDTO)
+                .build();
     }
 }

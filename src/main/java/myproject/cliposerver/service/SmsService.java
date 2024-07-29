@@ -40,16 +40,17 @@ public class SmsService {
                         .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
         member.changeValidate(true);
+        member.changePhone(requestDto.getPhone());
         memberRepository.save(member);
 
         return ResponseDTO.builder()
-                .message("검증 완료! 회원가입 완료되었습니다.")
+                .message("SMS Authentic Complete")
                 .build();
     }
 
     public boolean isVerify(SmsCertificationRequestDTO requestDto) {
         return !(smsCertificationDao.hasKey(requestDto.getPhone()) &&
                 smsCertificationDao.getSmsCertification(requestDto.getPhone())
-                        .equals(requestDto.getCertificationNumber()));
+                        .equals(requestDto.getValidateSMSCode()));
     }
 }

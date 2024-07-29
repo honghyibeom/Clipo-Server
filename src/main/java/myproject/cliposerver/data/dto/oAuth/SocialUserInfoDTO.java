@@ -1,4 +1,4 @@
-package myproject.cliposerver.data.dto.Oauth2;
+package myproject.cliposerver.data.dto.oAuth;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,12 +20,12 @@ public class SocialUserInfoDTO {
         this.profileImage = profileImage;
     }
 
-    public Member toEntity(){
+    public Member toEntity(SocialUserInfoDTO socialUserInfoDto){
         return Member.builder()
-                .email(email)
+                .email(socialUserInfoDto.getEmail())
                 .password(null)
                 .name(null)
-                .phone(mobile)
+                .phone(socialUserInfoDto.getMobile())
                 .isValidate(true)
                 .isSocial(true)
                 .role(Role.USER)

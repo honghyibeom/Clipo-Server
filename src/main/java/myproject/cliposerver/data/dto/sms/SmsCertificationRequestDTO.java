@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class SmsCertificationRequestDTO {
         private String phone;
-        private String certificationNumber;
+        private String validateSMSCode;
         private String email;
 }

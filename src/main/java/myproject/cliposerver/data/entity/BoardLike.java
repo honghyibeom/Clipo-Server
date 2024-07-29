@@ -6,19 +6,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "follow")
+@Entity(name = "boardLike")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Follow {
+public class BoardLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fno;
+    Long boardLno;
     @ManyToOne
-    @JoinColumn(name = "FromMember")
-    private Member fromMember;
+    @JoinColumn(name = "board")
+    Board board;
     @ManyToOne
-    @JoinColumn(name = "toMember")
-    private Member toMember;
+    @JoinColumn(name = "member")
+    Member member;
+
 }
