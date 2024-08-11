@@ -1,4 +1,4 @@
-package myproject.cliposerver.data.dto.member;
+package myproject.cliposerver.data.dto.auth;
 
 import lombok.Builder;
 import lombok.Getter;

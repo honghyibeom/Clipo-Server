@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
-import myproject.cliposerver.service.BoardService;
+import myproject.cliposerver.service.board.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +29,22 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> delete(@RequestParam Long bno,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardService.delete(bno, userDetails));
+    }
+
+    @GetMapping("/postInfo/post/{page}")
+    public ResponseEntity<ResponseDTO> getMyBoardList(@PathVariable("page") int page,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(boardService.getMyBoardResponse(page, userDetails));
+    }
+    @GetMapping("/postInfo/replies/{page}")
+    public ResponseEntity<ResponseDTO> getMyRepliesList(@PathVariable("page") int page,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(boardService.getMyReplyResponse(page, userDetails));
+    }
+    @GetMapping("/postInfo/likes/{page}")
+    public ResponseEntity<ResponseDTO> getMyLikesList(@PathVariable("page") int page,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(boardService.getMyLikesResponse(page, userDetails));
     }
 
 }

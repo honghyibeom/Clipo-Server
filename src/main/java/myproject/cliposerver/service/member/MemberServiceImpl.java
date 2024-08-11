@@ -1,0 +1,150 @@
+package myproject.cliposerver.service.member;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
+import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
+import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
+import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
+import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.exception.CustomException;
+import myproject.cliposerver.exception.ErrorCode;
+import myproject.cliposerver.repository.FollowRepository;
+import myproject.cliposerver.repository.MemberRepository;
+import myproject.cliposerver.service.Image.S3ImageService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@Log4j2
+@RequiredArgsConstructor
+public class MemberServiceImpl implements MemberService {
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final FollowRepository followRepository;
+    private final S3ImageService imageService;
+
+    @Transactional
+    public ResponseDTO updateProfileNickname(String username,
+                                             MultipartFile multipartFile,
+                                             UserDetailsImpl userDetails){
+        Optional<Member> optionalUser = memberRepository.findByName(username);
+        if (optionalUser.isPresent()) {
+            throw new CustomException(ErrorCode.EXIST_NICKNAME);
+        }
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        if (multipartFile != null && !multipartFile.isEmpty()){
+            String result = imageService.uploadFile(multipartFile);
+            member.changeProfileImage(result);
+        }
+        member.changeName(username);
+        memberRepository.save(member);
+
+        return ResponseDTO.builder()
+                .message("프로필 이미지 및 닉네임 변경 완료")
+                .build();
+    }
+
+    @Transactional
+    public ResponseDTO updatePassword(UpdatePasswordRequestDTO updatePasswordRequestDTO,
+                                      UserDetailsImpl userDetails) {
+
+        if (!passwordEncoder.matches(updatePasswordRequestDTO.getOldPassword(), userDetails.getMember().getPassword())) {
+            throw new CustomException(ErrorCode.NOT_EQUALS_PASSWORD);
+        }
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        member.changePassword(passwordEncoder.encode(updatePasswordRequestDTO.getNewPassword()));
+        memberRepository.save(member);
+        return ResponseDTO.builder()
+                .message("비밀번호 수정 완료")
+                .build();
+    }
+
+    public ResponseDTO getUserInformation(UserDetailsImpl userDetails) {
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        UserInfoResponseDTO userInfoResponseDTO = UserInfoResponseDTO.builder()
+                .email(member.getEmail())
+                .nickName(member.getName())
+                .profilePicture(member.getProfileImage())
+                .build();
+
+        return ResponseDTO.builder()
+                .message("유저정보를 확인했습니다.")
+                .body(userInfoResponseDTO)
+                .build();
+    }
+
+    public ResponseDTO getUserDetailsInformation(String email) {
+        Member member = getUser(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        UserInfoDetailsResponseDTO userResponseDTO = UserInfoDetailsResponseDTO.builder()
+                .email(member.getEmail())
+                .nickName(member.getName())
+                .profilePicture(member.getProfileImage())
+                .backgroundPicture(member.getBackgroundImage())
+                .location(member.getLocation())
+                .description(member.getDescription())
+                .followingNumber(followRepository.countByFromMember(member))
+                .followerNumber(followRepository.countByToMember(member))
+                .brithDay(member.getBirth())
+                .build();
+
+        return ResponseDTO.builder()
+                .message("유저정보를 확인했습니다.")
+                .body(userResponseDTO)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ResponseDTO updateUserInfo(UserDetailsImpl userDetails, UpdateUserInfoRequestDTO requestDTO,
+                                      MultipartFile profileImage, MultipartFile bgImage) {
+        Member member = getUser(userDetails.getEmail())
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        member.changeName(requestDTO.getNickName());
+        member.changeLocation(requestDTO.getLocation());
+        member.changeDescription(requestDTO.getDescription());
+        member.changeBirth(requestDTO.getBrithDay());
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            if (member.getProfileImage() != null) {
+                imageService.deleteFile(member.getProfileImage());
+            }
+            String result = imageService.uploadFile(profileImage);
+            member.changeProfileImage(result);
+        }
+        if (bgImage != null && !bgImage.isEmpty()) {
+            if (member.getBackgroundImage() != null) {
+                imageService.deleteFile(member.getBackgroundImage());
+            }
+            String result = imageService.uploadFile(bgImage);
+            member.changeBackgroundImage(result);
+        }
+        memberRepository.save(member);
+
+        return ResponseDTO.builder()
+                .message("유저편집 완료")
+                .build();
+    }
+
+    private Optional<Member> getUser(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+}

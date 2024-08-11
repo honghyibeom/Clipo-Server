@@ -2,11 +2,13 @@ package myproject.cliposerver.data.dto.member;
 
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Data
 @Builder
 public class UpdateProfileNicknameRequestDTO {
-    private String nickName;
-    private String profileImage;
+    private String username;
+    private MultipartFile profileImage;
 }

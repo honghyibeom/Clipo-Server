@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reply {
+public class Reply extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rno;
@@ -31,12 +31,17 @@ public class Reply {
     @Column(nullable = true)
     private String replyImage;
 
-    @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch= FetchType.EAGER)
     @JoinColumn(name = "parent_rno")
     private Reply parent; // 부모 댓글
 
+    @Builder.Default
     @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReplyLike> ReplyLikeList  = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reply> children = new ArrayList<>(); // Child replies
 
     public void changeText(String text) {
         this.text = text;

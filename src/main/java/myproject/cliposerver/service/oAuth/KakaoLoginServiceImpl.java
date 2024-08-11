@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myproject.cliposerver.config.jwt.JwtTokenUtil;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.member.LoginResponseDTO;
+import myproject.cliposerver.data.dto.auth.LoginResponseDTO;
 import myproject.cliposerver.data.dto.oAuth.SocialLoginDTO;
 import myproject.cliposerver.data.dto.oAuth.SocialUserInfoDTO;
 import myproject.cliposerver.data.entity.Member;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @Service("kakao")
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoLoginService implements SocialLoginInter {
+public class KakaoLoginServiceImpl implements SocialLoginService {
     private final MemberRepository memberRepository;
     private final JwtTokenUtil jwtUtil;
 

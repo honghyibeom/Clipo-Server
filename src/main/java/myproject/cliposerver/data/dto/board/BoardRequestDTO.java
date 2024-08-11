@@ -2,9 +2,7 @@ package myproject.cliposerver.data.dto.board;
 
 import lombok.Builder;
 import lombok.Getter;
-import myproject.cliposerver.data.entity.Board;
-import myproject.cliposerver.data.entity.BoardImage;
-import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.entity.*;
 
 import java.util.List;
 
@@ -12,18 +10,15 @@ import java.util.List;
 @Builder
 public class BoardRequestDTO {
     private Long bno;
-    private String title;
     private String content;
-    private String tag;
     private List<String> boardImageList;
+    private List<String> tag;
 
     public Board toEntity(Member member){
         return Board.builder()
-                .title(this.title)
                 .content(this.content)
                 .member(member)
                 .likes(0)
-                .tag(this.tag)
                 .build();
     }
 
@@ -31,6 +26,18 @@ public class BoardRequestDTO {
         return BoardImage.builder()
                 .board(board)
                 .src(src)
+                .build();
+    }
+    public Tag toEntity(String word){
+        return Tag.builder()
+                .word(word)
+                .build();
+    }
+
+    public TagMap toEntity(Board board, Tag tag){
+        return TagMap.builder()
+                .board(board)
+                .tag(tag)
                 .build();
     }
 }

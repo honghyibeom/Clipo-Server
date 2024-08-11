@@ -1,5 +1,6 @@
 package myproject.cliposerver.config.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myproject.cliposerver.exception.CustomException;
+import myproject.cliposerver.exception.CustomExceptionDTO;
 import myproject.cliposerver.exception.ErrorCode;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,7 +43,11 @@ public class JwtFilter extends OncePerRequestFilter {
             if (!request.getRequestURI().equals("/api/auth/recreate/accessToken")) {
                 //token 이 검증이 완료 되었으면 권한 세팅을 하고(user정보를 token에서 받아온 이후 권한 설정.)
                 Claims info = jwtTokenUtil.getUserInfoFromToken(token);
-                setAuthentication(info.getSubject(), token);
+                try {
+                    setAuthentication(info.getSubject(), token);
+                } catch (Exception e) {
+                    throw new CustomException(ErrorCode.FAIL_TO_CERTIFICATE);
+                }
             }
         }
         //원래 필터 체인으로 되돌리기

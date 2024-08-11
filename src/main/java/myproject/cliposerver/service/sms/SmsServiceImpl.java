@@ -1,4 +1,4 @@
-package myproject.cliposerver.service;
+package myproject.cliposerver.service.sms;
 
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.data.dto.ResponseDTO;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SmsService {
+public class SmsServiceImpl implements SmsService {
     private final SmsUtil smsUtil;
     private final SmsCertificationDao smsCertificationDao;
     private final MemberRepository memberRepository;

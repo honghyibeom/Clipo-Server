@@ -1,4 +1,4 @@
-package myproject.cliposerver.service;
+package myproject.cliposerver.service.boardlike;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class BoardLikeService {
+public class BoardLikeServiceImpl implements BoardLikeService {
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
 

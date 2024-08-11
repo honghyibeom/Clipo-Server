@@ -16,8 +16,15 @@ public enum ErrorCode {
     EXIST_NICKNAME("같은 닉네임이 존재 합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_BOARD("존재하지 않는 게시글",HttpStatus.BAD_REQUEST),
     NOT_EXIST_REPLY("존재하지 않는 댓글",HttpStatus.BAD_REQUEST),
+    NOT_EXIST_FOLLOW("팔로우가 되어있지 않습니다.",HttpStatus.BAD_REQUEST),
+    EMPTY_FILE_EXCEPTION("파일이 없습니다.",HttpStatus.BAD_REQUEST),
+    IO_EXCEPTION_ON_IMAGE_UPLOAD("S3 이미지 업로드 에러.",HttpStatus.BAD_REQUEST),
+    NO_FILE_EXTENTION("파일 형식이 아닙니다.",HttpStatus.BAD_REQUEST),
+    INVALID_FILE_EXTENTION("유효하지 않은 파일 형식입니다.",HttpStatus.BAD_REQUEST),
+    PUT_OBJECT_EXCEPTION("S3 이미지 업로드중 에러.",HttpStatus.BAD_REQUEST),
+    IO_EXCEPTION_ON_IMAGE_DELETE("S3 이미지 삭제중 에러.",HttpStatus.BAD_REQUEST),
     ALREADY_CHANGED_TOKEN("이미 재발급이 완료된 토큰입니다.",HttpStatus.UNAUTHORIZED),
-    FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.\n다시 로그인 해주세요.",HttpStatus.UNAUTHORIZED);
+    FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.",HttpStatus.UNAUTHORIZED);
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

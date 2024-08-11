@@ -1,4 +1,4 @@
-package myproject.cliposerver.service;
+package myproject.cliposerver.service.reply;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,12 +14,10 @@ import myproject.cliposerver.repository.ReplyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class ReplyService {
+public class ReplyServiceImpl implements ReplyService {
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
 

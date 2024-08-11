@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import myproject.cliposerver.config.jwt.JwtTokenUtil;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.member.LoginResponseDTO;
+import myproject.cliposerver.data.dto.auth.LoginResponseDTO;
 import myproject.cliposerver.data.dto.oAuth.SocialLoginDTO;
 import myproject.cliposerver.data.dto.oAuth.SocialUserInfoDTO;
 import myproject.cliposerver.data.entity.Member;
@@ -27,22 +27,22 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-@Service("google")
+@Service("naver")
 @Slf4j
 @RequiredArgsConstructor
-public class GoogleLoginService implements SocialLoginInter {
+public class NaverLoginServiceImpl implements SocialLoginService {
     private final MemberRepository memberRepository;
     private final JwtTokenUtil jwtUtil;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
     private String client_id;
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
     private String redirect_uri;
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
     private String client_secret;
-    @Value("${spring.security.oauth2.client.provider.google.token-uri}")
+    @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
     private String token_url;
-    @Value("${spring.security.oauth2.client.provider.google.user-info-uri}")
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String user_info_url;
 
     public ResponseDTO login(SocialLoginDTO socialLoginDTO) throws JsonProcessingException {
@@ -70,7 +70,6 @@ public class GoogleLoginService implements SocialLoginInter {
             return getResponseDTO(createToken, refreshToken);
         }
     }
-
 
     public String getAccessToken(SocialLoginDTO socialLoginDTO) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
@@ -132,18 +131,20 @@ public class GoogleLoginService implements SocialLoginInter {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
-        String nickname = jsonNode.get("name").asText();
-        String email = jsonNode.get("email").asText();
-        String profileImage = jsonNode.get("picture").asText();
+        String nickname = jsonNode.get("response").get("nickname").asText();
+        String email = jsonNode.get("response").get("email").asText();
+        String mobile = jsonNode.get("response").get("mobile").asText();
+        String profileImage = jsonNode.get("response").get("profile_image").asText();
 
         log.info(nickname);
         log.info(email);
         log.info(profileImage);
+        log.info(mobile);
 
-        return new SocialUserInfoDTO(nickname, email, null, profileImage);
+        return new SocialUserInfoDTO(nickname, email, mobile,profileImage);
     }
 
-    private static ResponseDTO getResponseDTO(String createToken, String refreshToken) {
+    private ResponseDTO getResponseDTO(String createToken, String refreshToken) {
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(createToken)
                 .refreshToken(refreshToken)
