@@ -15,14 +15,28 @@ public class FollowController {
     private final FollowService followService;
 
     @PostMapping("/following")
-    public ResponseEntity<ResponseDTO> following(@RequestParam String toMemberEmail,
+    public ResponseEntity<ResponseDTO> following(@RequestParam("username") String toMemberUsername,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(followService.follow(toMemberEmail, userDetails));
+        return ResponseEntity.ok(followService.follow(toMemberUsername, userDetails));
     }
-    @PostMapping("/unfollow")
-    public ResponseEntity<ResponseDTO> unfollow(@RequestParam String toMemberEmail,
+    @PostMapping("/unfollowing")
+    public ResponseEntity<ResponseDTO> unfollow(@RequestParam("username") String toMemberUsername,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(followService.unfollow(toMemberEmail, userDetails));
+        return ResponseEntity.ok(followService.unfollow(toMemberUsername, userDetails));
+    }
+
+    @GetMapping("/get/users/{username}/follower/{page}")
+    public ResponseEntity<ResponseDTO> getFollow(@PathVariable("username") String username,
+                                                 @PathVariable("page") int page,
+                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(followService.getUserFollower(username,page,userDetails));
+    }
+
+    @GetMapping("/get/users/{username}/following/{page}")
+    public ResponseEntity<ResponseDTO> getFollowing(@PathVariable("username") String username,
+                                                    @PathVariable("page") int page,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(followService.getUserFollowing(username,page,userDetails));
     }
 
 }

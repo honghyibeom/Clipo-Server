@@ -30,29 +30,15 @@ public class S3ImageService {
 
     @Value("${cloud.aws.s3.bucketName}")
     private String bucket;
-    public ResponseDTO uploadFileList(List<MultipartFile> multipartFile) {
+    public List<String> uploadFileList(List<MultipartFile> multipartFile) {
         List<String> fileNameList = new ArrayList<>();
 
         multipartFile.forEach(file -> {
-            String fileName = createFileName(file.getOriginalFilename());
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(file.getSize());
-            objectMetadata.setContentType(file.getContentType());
-
-            try(InputStream inputStream = file.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch(IOException e) {
-                throw new CustomException(ErrorCode.PUT_OBJECT_EXCEPTION);
-            }
-
-            fileNameList.add("https://clipo-bucket-123123.s3.ap-northeast-2.amazonaws.com/"+fileName);
+            String name = uploadFile(file);
+            fileNameList.add(name);
         });
 
-        return ResponseDTO.builder()
-                .body(fileNameList)
-                .message("이미지 저장 성공")
-                .build();
+        return fileNameList;
     }
 
     public String uploadFile(MultipartFile multipartFile) {
@@ -71,12 +57,26 @@ public class S3ImageService {
         return "https://clipo-bucket-123123.s3.ap-northeast-2.amazonaws.com/"+fileName;
     }
 
-
-
     // 파일 삭제
     public void deleteFile(String fileName) {
+        String newFileName = extractFileName(fileName);
+        s3Client.deleteObject(new DeleteObjectRequest(bucket, newFileName));
+    }
 
-        s3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+    // 파일 존재여부
+    public boolean doesFileExist(String fileName) {
+        String newFileName = extractFileName(fileName);
+        try {
+            return s3Client.doesObjectExist(bucket, newFileName);
+        } catch (Exception e) {
+            log.error("Error while checking file existence in S3", e);
+            throw new CustomException(ErrorCode.S3_CHECK_FILE_EXISTENCE_EXCEPTION);
+        }
+    }
+
+    public String extractFileName(String fullUrl) {
+        String prefix = "https://clipo-bucket-123123.s3.ap-northeast-2.amazonaws.com/";
+        return fullUrl.replace(prefix, "");
     }
 
     // 파일명 중복 방지 (UUID)

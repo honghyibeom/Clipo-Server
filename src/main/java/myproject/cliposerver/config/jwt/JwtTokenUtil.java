@@ -64,20 +64,19 @@ public class JwtTokenUtil {
     }
 
     //토큰 정보를 검증하는 메서드
-    public boolean validateToken(String token) {
+    public String validateToken(String token) {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-            return true;
+            return "pass";
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+            return "잘못된 JWT 서명입니다.";
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            return "expire";
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            return "지원되지 않는 JWT 토큰입니다.";
         } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+            return "JWT 토큰이 잘못되었습니다.";
         }
-        return false;
     }
 
     //토큰정보 parsing 메서드

@@ -5,41 +5,51 @@ import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
-import myproject.cliposerver.data.dto.board.BoardMainResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
+import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.*;
 
+import myproject.cliposerver.data.enumerate.TypeOfPost;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.*;
+import myproject.cliposerver.service.Image.S3ImageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
-    private final BoardImageRepository boardImageRepository;
     private final ReplyRepository replyRepository;
     private final TagRepository tagRepository;
+    private final BoardImageRepository boardImageRepository;
     private final TagMapRepository tagMapRepository;
+    private final MemberRepository memberRepository;
+    private final BoardLikeRepository boardLikeRepository;
+    private final ReplyLikeRepository replyLikeRepository;
+    private final S3ImageService imageService;
 
     @Transactional
-    public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, UserDetailsImpl userDetails){
+    public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages , UserDetailsImpl userDetails){
         Board board = boardRequestDTO.toEntity(userDetails.getMember());
 
         //이미지 생성
-        List<BoardImage> boardImageList = new ArrayList<>();
-        for (String boardImage: boardRequestDTO.getBoardImageList()) {
-            boardImageList.add(boardRequestDTO.toEntity(board,boardImage));
+        if (!boardImages.isEmpty()) {
+            List<BoardImage> boardImageList = new ArrayList<>();
+            List<String> imageUrl = imageService.uploadFileList(boardImages);
+            for (String boardImage: imageUrl) {
+                boardImageList.add(boardRequestDTO.toEntity(board,boardImage));
+            }
+            board.changeBoardImageList(boardImageList);
         }
-        board.changeBoardImageList(boardImageList);
         //tag 생성
         List<Tag> boardTagList = new ArrayList<>();
         for (String tag: boardRequestDTO.getTag()){
@@ -60,20 +70,51 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
-    @Transactional// 태그 때문에 수정중
-    public ResponseDTO update(BoardRequestDTO boardRequestDTO, UserDetailsImpl userDetails) {
+    @Transactional//수정중
+    public ResponseDTO update(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages ,UserDetailsImpl userDetails) {
         Board board = boardRepository.findByBno(boardRequestDTO.getBno())
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
-        identification(board.getMember().getEmail(),userDetails.getEmail() );
+
+        identification(board.getMember().getEmail(),userDetails.getEmail());
+
+        // 유지할 기존 이미지
+        Set<String> originImage = Optional.ofNullable(boardRequestDTO.getOriginImages())
+                .map(HashSet::new)
+                .orElse(new HashSet<>());
+
+        // 삭제할 이미지 추출
+        List<String> deleteImages = board.getBoardImageList().stream()
+                .map(BoardImage::getSrc)
+                .filter(src -> !originImage.contains(src)) // originImage에 포함되지 않은 이미지를 삭제 대상으로 필터링
+                .toList();
+
+        // 삭제 대상 이미지 처리
+        if (!deleteImages.isEmpty()) {
+            deleteImages.forEach(src -> {
+                boardImageRepository.deleteBySrc(src); // DB에서 삭제
+                imageService.deleteFile(src);          // S3에서 삭제
+            });
+        }
+
+        // 새 이미지 업로드 및 저장
+        if (boardImages != null && !boardImages.isEmpty()) {
+            List<String> uploadedUrls = imageService.uploadFileList(boardImages);
+            List<BoardImage> newImages = uploadedUrls.stream()
+                    .map(url -> boardRequestDTO.toEntity(board, url))
+                    .toList();
+            board.getBoardImageList().addAll(newImages); // 새 이미지를 엔티티에 추가
+        }
+
+        //테그 삭제 후 추가
+        List<TagMap> tagMaps = processTags(boardRequestDTO, board);
+        board.changeTagMapList(tagMaps);
+
         //board 수정
         board.changeContent(boardRequestDTO.getContent());
-        //이미지 삭제 후 추가 작업
-        boardImageRepository.deleteByBoard(board);
-        for (String boardImage: boardRequestDTO.getBoardImageList()) {
-            boardImageRepository.save(boardRequestDTO.toEntity(board,boardImage));
-        }
-        boardRepository.save(board);
+        board.changeLikeVisible(boardRequestDTO.getIsLikeVisible());
+        board.changeReplyAllowed(boardRequestDTO.getIsReplyAllowed());
 
+        boardRepository.save(board);
         return ResponseDTO.builder()
                 .message("게시글 수정 완료")
                 .build();
@@ -87,6 +128,10 @@ public class BoardServiceImpl implements BoardService {
 
         identification(board.getMember().getEmail(), userDetails.getEmail());
 
+        for (String fileName : board.getBoardImageList().stream().map(BoardImage :: getSrc).toList()) {
+            imageService.deleteFile(fileName);
+        }
+
         boardRepository.delete(board);
         return ResponseDTO.builder()
                 .message("삭제 완료")
@@ -94,23 +139,16 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
-    public ResponseDTO getMyBoardResponse(int page, UserDetailsImpl userDetails) {
+    public ResponseDTO getMyBoardResponse(int page, String username,UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Board> pages = boardRepository.findByMemberOrderByRegDateDesc(userDetails.getMember(), pageRequest);
+        Member member = memberRepository.findByName(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        Page<Board> pages = boardRepository.findByMemberOrderByRegDateDesc(member, pageRequest);
         List<Board> result = pages.getContent();
         List<BoardInfoResponseDTO> responseList = new ArrayList<>();
         for (Board board : result) {
-            BoardInfoResponseDTO boardInfoResponseDTO = BoardInfoResponseDTO.builder()
-                    .email(board.getMember().getEmail())
-                    .nickName(board.getMember().getName())
-                    .profilePicture(board.getMember().getProfileImage())
-                    .boardImage(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
-                    .numberOfLike(board.getLikes())
-                    .numberOfComments(replyRepository.countByBoard(board))
-                    .contents(board.getContent())
-                    .tag(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
-                    .regDate(String.valueOf(board.getRegDate()))
-                    .build();
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }
         return ResponseDTO.builder()
@@ -120,51 +158,50 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public ResponseDTO getMyReplyResponse(int page, UserDetailsImpl userDetails) {
+    public ResponseDTO getMyReplyResponse(int page, String username, UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Reply> pages = replyRepository.findByWriterOrderByRegDateDesc(userDetails.getMember(), pageRequest);
+
+        Member member = memberRepository.findByName(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+        Page<Reply> pages = replyRepository.findByWriterOrderByRegDateDesc(member, pageRequest);
         List<Reply> result = pages.getContent();
 
-        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+        List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
         for (Reply reply : result) {
-            BoardInfoResponseDTO boardInfoResponseDTO = BoardInfoResponseDTO.builder()
+            ReplyInfoResponseDTO replyInfoResponseDTO = ReplyInfoResponseDTO.builder()
+                    .rno(reply.getRno())
+                    .typeOfPost(TypeOfPost.reply.name())
                     .email(reply.getWriter().getEmail())
                     .nickName(reply.getWriter().getName())
                     .profilePicture(reply.getWriter().getProfileImage())
                     .replyImage(reply.getReplyImage())
-                    .numberOfLike(reply.getLikes())
+                    .numberOfLike(replyLikeRepository.countByReply(reply))
                     .numberOfComments(replyRepository.countByParent(reply))
                     .contents(reply.getText())
-                    .tag(null)
                     .regDate(String.valueOf(reply.getRegDate()))
+                    .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
                     .build();
-            responseList.add(boardInfoResponseDTO);
+            responseList.add(replyInfoResponseDTO);
         }
 
         return ResponseDTO.builder()
-                .message("댓글을 확인했습니다.")
+                .message("작성한 댓글을 확인했습니다.")
                 .body(responseList)
                 .build();
     }
 
     @Override
-    public ResponseDTO getMyLikesResponse(int page, UserDetailsImpl userDetails) {
+    public ResponseDTO getMyLikesResponse(int page, String username,UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Board> boardPages = boardRepository.findByBoardLikeListMemberOrderByRegDateDesc(userDetails.getMember(), pageRequest);
+        Member member = memberRepository.findByName(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        Page<Board> boardPages = boardRepository.findByBoardLikeListMemberOrderByRegDateDesc(member, pageRequest);
         List<Board> result = boardPages.getContent();
         List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+
         for (Board board : result) {
-            BoardInfoResponseDTO boardInfoResponseDTO = BoardInfoResponseDTO.builder()
-                    .email(board.getMember().getEmail())
-                    .nickName(board.getMember().getName())
-                    .profilePicture(board.getMember().getProfileImage())
-                    .boardImage(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
-                    .numberOfLike(board.getLikes())
-                    .numberOfComments(replyRepository.countByBoard(board))
-                    .contents(board.getContent())
-                    .tag(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
-                    .regDate(String.valueOf(board.getRegDate()))
-                    .build();
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }
         return ResponseDTO.builder()
@@ -174,28 +211,64 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public ResponseDTO getRandomBoard(int page) {
+    public ResponseDTO getRandomBoard(int page,UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
         Page<Board> boardPages = boardRepository.findAllByOrderByRegDateDesc(pageRequest);
+
         List<Board> result = boardPages.getContent();
-        List<BoardMainResponseDTO> responseList = new ArrayList<>();
+        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+
         for(Board board: result) {
-            BoardMainResponseDTO boardMainResponseDTO = BoardMainResponseDTO.builder()
-                    .nickName(board.getMember().getName())
-                    .profilePicture(board.getMember().getProfileImage())
-                    .numberOfLike(board.getLikes())
-                    .numberOfComments(replyRepository.countByBoard(board))
-                    .contents(board.getContent())
-                    .tags(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
-                    .regData(String.valueOf(board.getRegDate()))
-                    .build();
-            responseList.add(boardMainResponseDTO);
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
+            responseList.add(boardInfoResponseDTO);
         }
 
         return ResponseDTO.builder()
                 .message("메인페이지 조회")
                 .body(responseList)
                 .build();
+    }
+
+    @Override
+    public ResponseDTO getDetailBoard(Long bno, UserDetailsImpl userDetails) {
+        Board board = boardRepository.findByBno(bno)
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
+        BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
+
+        return ResponseDTO.builder()
+                .message("board 상세 조회")
+                .body(boardInfoResponseDTO)
+                .build();
+    }
+
+    private BoardInfoResponseDTO getBoardInfoResponseDTO(Board board, UserDetailsImpl userDetails) {
+
+        return BoardInfoResponseDTO.builder()
+                .bno(board.getBno())
+                .typeOfPost(TypeOfPost.board.name())
+                .nickName(board.getMember().getName())
+                .profilePicture(board.getMember().getProfileImage())
+                .numberOfLike(boardLikeRepository.countByBoard(board))
+                .numberOfComments(replyRepository.countByBoard(board))
+                .contents(board.getContent())
+                .tag(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
+                .regDate(String.valueOf(board.getRegDate()))
+                .boardImages(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
+                .isLike(boardLikeRepository.existsByBoardAndMember(board, userDetails.getMember()))
+                .build();
+    }
+
+    private List<TagMap> processTags(BoardRequestDTO boardRequestDTO, Board board) {
+        tagMapRepository.deleteByBoard(board);
+
+        List<Tag> tags = boardRequestDTO.getTag().stream()
+                .map(boardRequestDTO::toEntity)
+                .toList();
+        tagRepository.saveAll(tags);
+
+        return tags.stream()
+                .map(tag -> boardRequestDTO.toEntity(board, tag))
+                .toList();
     }
 
     private void identification(String memberEmail, String userDetailsEmail) {

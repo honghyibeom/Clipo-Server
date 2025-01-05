@@ -21,8 +21,8 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping(value = "/update/profileNickname")
-    public ResponseEntity<ResponseDTO> updateProfileNickname(@RequestPart("username") String username,
-                                                             @RequestPart(value = "file", required = false) MultipartFile file,
+    public ResponseEntity<ResponseDTO> updateProfileNickname(@RequestPart("nickName") String username,
+                                                             @RequestPart(value = "files", required = false) MultipartFile file,
                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.updateProfileNickname(username,file,userDetails));
     }
@@ -32,19 +32,20 @@ public class MemberController {
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.updatePassword(updatePasswordRequestDTO, userDetails));
     }
-    @GetMapping("/get/userInformation")
-    public ResponseEntity<ResponseDTO> userInformationDetails(@RequestParam String email) {
-        return ResponseEntity.ok(memberService.getUserDetailsInformation(email));
+    @GetMapping("/get/userInformation/{username}")
+    public ResponseEntity<ResponseDTO> userInformationDetails(@PathVariable String username,
+                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(memberService.getUserDetailsInformation(username, userDetails));
     }
     @GetMapping("/get/user/information")
     public ResponseEntity<ResponseDTO> userInformation(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(memberService.getUserInformation(userDetails));
     }
-    @PostMapping("/update/userInformation")
+    @PatchMapping("/update/userInformation")
     public ResponseEntity<ResponseDTO> updateUserInformation(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                              @ModelAttribute UpdateUserInfoRequestDTO requestDTO,
-                                                             @RequestPart(value = "profilePicture", required = false) MultipartFile profileImage,
-                                                             @RequestPart(value = "backgroundPicture", required = false) MultipartFile bgImage
+                                                             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+                                                             @RequestPart(value = "backgroundImage", required = false) MultipartFile bgImage
                                                              ) {
         return ResponseEntity.ok(memberService.updateUserInfo(userDetails, requestDTO, profileImage, bgImage));
     }

@@ -23,8 +23,10 @@ public class Board extends BaseEntity {
     private Member member;
     @Column(nullable = false)
     private String content;
-    @Column(nullable = true)
-    private Integer likes;
+    @Column(nullable = false)
+    private Boolean isLikeVisible;
+    @Column(nullable = false)
+    private Boolean isReplyAllowed;
 
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -44,6 +46,14 @@ public class Board extends BaseEntity {
 
     public void changeContent(String content) {
         this.content = content;
+    }
+
+    public void changeLikeVisible(Boolean likeVisible) {
+        isLikeVisible = likeVisible;
+    }
+
+    public void changeReplyAllowed(Boolean replyAllowed) {
+        isReplyAllowed = replyAllowed;
     }
 
     public void changeBoardImageList(List<BoardImage> boardImageList) {

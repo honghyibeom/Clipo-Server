@@ -12,4 +12,7 @@ import java.util.Optional;
 @Repository
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
     void deleteByBoardAndMember(Board board, Member member);
+    Long countByBoard(Board board);
+    Boolean  existsByBoardAndMember(Board board, Member member);
+
 }

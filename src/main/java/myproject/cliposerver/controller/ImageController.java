@@ -17,10 +17,10 @@ import java.util.List;
 public class ImageController {
     private final S3ImageService s3ImageService;
     @PostMapping(value = "/s3/upload")
-    public ResponseEntity<ResponseDTO> s3Upload(@RequestPart List<MultipartFile> files){
+    public List<String> s3Upload(@RequestPart List<MultipartFile> files){
         if (files == null) {
             throw new CustomException(ErrorCode.EMPTY_FILE_EXCEPTION);
         }
-        return ResponseEntity.ok(s3ImageService.uploadFileList(files));
+        return s3ImageService.uploadFileList(files);
     }
 }

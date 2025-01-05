@@ -9,5 +9,5 @@ public class UpdateUserInfoRequestDTO {
     private String nickName;
     private String location;
     private String description;
-    private String brithDay;
+    private String birthday;
 }

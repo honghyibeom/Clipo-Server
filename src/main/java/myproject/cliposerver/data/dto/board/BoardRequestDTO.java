@@ -11,14 +11,17 @@ import java.util.List;
 public class BoardRequestDTO {
     private Long bno;
     private String content;
-    private List<String> boardImageList;
     private List<String> tag;
+    private List<String> originImages;
+    private Boolean isLikeVisible;
+    private Boolean isReplyAllowed;
 
     public Board toEntity(Member member){
         return Board.builder()
                 .content(this.content)
                 .member(member)
-                .likes(0)
+                .isLikeVisible(this.isLikeVisible)
+                .isReplyAllowed(this.isReplyAllowed)
                 .build();
     }
 

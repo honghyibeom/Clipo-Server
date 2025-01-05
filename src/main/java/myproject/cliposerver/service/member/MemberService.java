@@ -14,7 +14,7 @@ public interface MemberService {
     ResponseDTO updateProfileNickname(String username, MultipartFile multipartFile, UserDetailsImpl userDetails);
     ResponseDTO updatePassword(UpdatePasswordRequestDTO updatePasswordRequestDTO, UserDetailsImpl userDetails);
     ResponseDTO getUserInformation(UserDetailsImpl userDetails);
-    ResponseDTO getUserDetailsInformation(String email);
+    ResponseDTO getUserDetailsInformation(String username, UserDetailsImpl userDetails);
     ResponseDTO updateUserInfo(UserDetailsImpl userDetails, UpdateUserInfoRequestDTO requestDTO, MultipartFile profileImage, MultipartFile bgImage);
 
 }

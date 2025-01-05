@@ -15,6 +15,6 @@ public class UserInfoDetailsResponseDTO {
     private Long followingNumber;
     private Long followerNumber;
     private String brithDay;
-
+    private boolean isFollowing;
 
 }

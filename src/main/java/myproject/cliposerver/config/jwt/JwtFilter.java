@@ -37,8 +37,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = jwtTokenUtil.resolveToken(request);
 
         if (token != null) {
-            if (!jwtTokenUtil.validateToken(token)) {
-                throw new CustomException(ErrorCode.FAIL_TO_CERTIFICATE);
+            String status = jwtTokenUtil.validateToken(token);
+            if (!status.equals("pass")) {
+                if (!status.equals("만료된 JWT 토큰입니다.")){
+                    returnErrorResponse(ErrorCode.EXPIRED_TOKEN, response);
+                    return;
+                }
+                returnErrorResponse(ErrorCode.NOT_VALIDATE_TOKEN, response);
+                return;
             }
             if (!request.getRequestURI().equals("/api/auth/recreate/accessToken")) {
                 //token 이 검증이 완료 되었으면 권한 세팅을 하고(user정보를 token에서 받아온 이후 권한 설정.)
@@ -65,6 +71,25 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.setContext(context);
         } catch (Exception e) {
             log.error("spring security context 설정중 에러 발생", e);
+        }
+    }
+
+    public void returnErrorResponse(ErrorCode errorCode, HttpServletResponse response) {
+        log.error("spring security context 설정중 에러 발생 errorMessage: {}", errorCode.getErrorMessage());
+        ObjectMapper objectMapper = new ObjectMapper();
+        //status 는 errorCode 의 HttpStatus.val();
+        response.setStatus(errorCode.getHttpStatus().value());
+        //미디어 타입은 json
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        //인코딩 utf8
+        response.setCharacterEncoding("utf-8");
+        //errorMessage 를 "data" 값으로 하는 ResponseDto 객제 생성.
+        CustomExceptionDTO responseDto = new CustomExceptionDTO(errorCode);
+        //response 출력.
+        try {
+            response.getWriter().write(objectMapper.writeValueAsString(responseDto));
+        } catch (IOException ioException) {
+            log.error("servletResponse 사용중 에러 발생: {}", ioException.getStackTrace());
         }
     }
 }

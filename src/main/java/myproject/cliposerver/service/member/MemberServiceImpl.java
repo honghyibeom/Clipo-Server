@@ -8,6 +8,7 @@ import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
 import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
+import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
@@ -18,9 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -88,9 +86,14 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    public ResponseDTO getUserDetailsInformation(String email) {
-        Member member = getUser(email)
+    public ResponseDTO getUserDetailsInformation(String username, UserDetailsImpl userDetails) {
+        // 상대의 정보
+        Member member = memberRepository.findByName(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        Optional<Follow> follow = followRepository.findByFromMemberAndToMember(userDetails.getMember(), member);
+        //팔로우가 되어있다면 true, 되어있지 않다면 false
+        boolean isFollow = follow.isPresent();
 
         UserInfoDetailsResponseDTO userResponseDTO = UserInfoDetailsResponseDTO.builder()
                 .email(member.getEmail())
@@ -102,6 +105,7 @@ public class MemberServiceImpl implements MemberService {
                 .followingNumber(followRepository.countByFromMember(member))
                 .followerNumber(followRepository.countByToMember(member))
                 .brithDay(member.getBirth())
+                .isFollowing(isFollow)
                 .build();
 
         return ResponseDTO.builder()
@@ -120,7 +124,7 @@ public class MemberServiceImpl implements MemberService {
         member.changeName(requestDTO.getNickName());
         member.changeLocation(requestDTO.getLocation());
         member.changeDescription(requestDTO.getDescription());
-        member.changeBirth(requestDTO.getBrithDay());
+        member.changeBirth(requestDTO.getBirthday());
 
         if (profileImage != null && !profileImage.isEmpty()) {
             if (member.getProfileImage() != null) {

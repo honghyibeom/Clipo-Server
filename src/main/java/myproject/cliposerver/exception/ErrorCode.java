@@ -11,7 +11,7 @@ public enum ErrorCode {
     EXIST_USER("중복된 사용자가 존재합니다.", HttpStatus.BAD_REQUEST),
     NOT_EQUALS_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     SMS_CERTIFICATION_NUMBER_MISMATCH("인증번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
-    NOT_VALIDATE_USER("인증되지 않은 유저입니다.", HttpStatus.BAD_REQUEST),
+    NOT_VALIDATE_USER("인증되지 않은 유저입니다.", HttpStatus.UNAUTHORIZED),
     NOT_VALIDATE_TOKEN("유효한 토큰이 아닙니다.", HttpStatus.BAD_REQUEST),
     EXIST_NICKNAME("같은 닉네임이 존재 합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_BOARD("존재하지 않는 게시글",HttpStatus.BAD_REQUEST),
@@ -24,7 +24,10 @@ public enum ErrorCode {
     PUT_OBJECT_EXCEPTION("S3 이미지 업로드중 에러.",HttpStatus.BAD_REQUEST),
     IO_EXCEPTION_ON_IMAGE_DELETE("S3 이미지 삭제중 에러.",HttpStatus.BAD_REQUEST),
     ALREADY_CHANGED_TOKEN("이미 재발급이 완료된 토큰입니다.",HttpStatus.UNAUTHORIZED),
-    FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.",HttpStatus.UNAUTHORIZED);
+    FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.",HttpStatus.UNAUTHORIZED),
+    EXPIRED_TOKEN("토큰이 만료되었습니다.", HttpStatus.FORBIDDEN),
+    S3_CHECK_FILE_EXISTENCE_EXCEPTION("S3_CHECK_FILE_EXISTENCE_EXCEPTION", HttpStatus.BAD_REQUEST),
+    EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST);
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

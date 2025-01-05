@@ -8,6 +8,7 @@ import myproject.cliposerver.service.reply.ReplyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,24 +16,35 @@ import org.springframework.web.bind.annotation.*;
 public class ReplyController {
     private final ReplyService replyService;
 
-    @PostMapping("/insert")
-    public ResponseEntity<ResponseDTO> insertReply(@RequestBody ReplyRequestDTO replyRequestDTO,
+    @PostMapping("/create")
+    public ResponseEntity<ResponseDTO> insertReply(@ModelAttribute ReplyRequestDTO replyRequestDTO,
+                                                   @RequestPart MultipartFile commentImage,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(replyService.createReply(replyRequestDTO, userDetails));
+        return ResponseEntity.ok(replyService.createReply(replyRequestDTO, userDetails, commentImage));
     }
-    @PostMapping("/insert/child")
-    public ResponseEntity<ResponseDTO> insertChildReply(@RequestBody ReplyRequestDTO replyRequestDTO,
-                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(replyService.createChildReply(replyRequestDTO, userDetails));
-    }
-    @PostMapping("/update")
-    public ResponseEntity<ResponseDTO> updateReply(@RequestBody ReplyRequestDTO replyRequestDTO,
+    @PatchMapping("/update")
+    public ResponseEntity<ResponseDTO> updateReply(@ModelAttribute ReplyRequestDTO replyRequestDTO,
+                                                   @RequestPart MultipartFile commentImage,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(replyService.updateReply(replyRequestDTO, userDetails));
+        return ResponseEntity.ok(replyService.updateReply(replyRequestDTO, userDetails, commentImage));
     }
     @PostMapping("/delete")
     public ResponseEntity<ResponseDTO> deleteReply(@RequestParam Long rno,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.deleteReply(rno, userDetails));
+    }
+
+    @GetMapping("/detail/{page}")
+    public ResponseEntity<ResponseDTO> getDetailReply(@RequestParam("bno") Long bno,
+                                                      @PathVariable("page") int page,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(replyService.getDetailReply(bno,page,userDetails));
+    }
+
+    @GetMapping("/detail/nest/{page}")
+    public ResponseEntity<ResponseDTO> getDetailChildReply(@RequestParam("rno") Long rno,
+                                                           @PathVariable("page") int page,
+                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(replyService.getDetailChildReply(rno,page, userDetails));
     }
 }

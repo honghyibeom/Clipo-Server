@@ -1,24 +1,23 @@
-package myproject.cliposerver.data.dto.board;
+package myproject.cliposerver.data.dto.reply;
 
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
 @Getter
-public class BoardInfoResponseDTO {
+public class ReplyInfoResponseDTO {
+    private Long rno;
     private String typeOfPost;
-    private Long bno;
-    private String nickName;
     private String email;
+    private String nickName;
     private String profilePicture;
-    private List<String> boardImages;
+    private List<String> boardImage;
+    private String replyImage;
     private Long numberOfLike;
     private Long numberOfComments;
     private String contents;
-    private List<String> tag;
     private String regDate;
     private Boolean isLike;
 }
