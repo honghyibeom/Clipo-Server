@@ -14,10 +14,10 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다.
  - 팀원2  : 유현우 - React Client
 
 ### ⚙️ 개발 환경
-- `Java 8`
+- `Java 17`
 - `JDK 1.8.0`
 - **IDE** : STS 3.9
-- **Framework** : Springboot(2.x)
+- **Framework** : Springboot(3.3.1)
 - **Database** : Maria DB(11xe)
 - **ORM** : JPA
 
