@@ -74,7 +74,7 @@ public class FollowServiceImpl implements FollowService{
         List<FollowInfoResponseDTO> responseList = getFollowInfoResponseDTOS(username, page, userDetails, gbn);
 
         return ResponseDTO.builder()
-                .message("팔로우 조회")
+                .message("팔로잉 조회")
                 .body(responseList)
                 .build();
     }
@@ -93,19 +93,19 @@ public class FollowServiceImpl implements FollowService{
         List<FollowInfoResponseDTO> responseList = new ArrayList<>();
 
         if (gbn.equals("follower")){
-            List<Follow> result = followerPage.getContent();
+            List<Follow> result = followingPage.getContent();
             for (Follow follow: result) {
                 FollowInfoResponseDTO followInfoResponseDTO = FollowInfoResponseDTO.builder()
-                        .profilePicture(follow.getToMember().getProfileImage())
-                        .nickName(follow.getToMember().getName())
-                        .email(follow.getToMember().getEmail())
+                        .profilePicture(follow.getFromMember().getProfileImage())
+                        .nickName(follow.getFromMember().getName())
+                        .email(follow.getFromMember().getEmail())
                         .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(),member))
                         .build();
                 responseList.add(followInfoResponseDTO);
             }
         }
         else if (gbn.equals("following")) {
-            List<Follow> result = followingPage.getContent();
+            List<Follow> result = followerPage.getContent();
             for (Follow follow: result) {
                 FollowInfoResponseDTO followInfoResponseDTO = FollowInfoResponseDTO.builder()
                         .profilePicture(follow.getToMember().getProfileImage())

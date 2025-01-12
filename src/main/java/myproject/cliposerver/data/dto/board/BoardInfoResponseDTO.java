@@ -21,4 +21,7 @@ public class BoardInfoResponseDTO {
     private List<String> tag;
     private String regDate;
     private Boolean isLike;
+    private Boolean isFollowing;
+    private Boolean isLikeVisible;
+    private Boolean isReplyAllowed;
 }

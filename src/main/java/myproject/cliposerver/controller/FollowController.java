@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 public class FollowController {
     private final FollowService followService;
 
-    @PostMapping("/following")
-    public ResponseEntity<ResponseDTO> following(@RequestParam("username") String toMemberUsername,
+    @PostMapping("/following/{username}")
+    public ResponseEntity<ResponseDTO> following(@PathVariable("username") String toMemberUsername,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(followService.follow(toMemberUsername, userDetails));
     }
-    @PostMapping("/unfollowing")
-    public ResponseEntity<ResponseDTO> unfollow(@RequestParam("username") String toMemberUsername,
+    @PostMapping("/unFollowing/{username}")
+    public ResponseEntity<ResponseDTO> unfollow(@PathVariable("username") String toMemberUsername,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(followService.unfollow(toMemberUsername, userDetails));
     }

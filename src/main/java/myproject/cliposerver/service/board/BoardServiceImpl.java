@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -30,6 +29,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final ReplyRepository replyRepository;
     private final TagRepository tagRepository;
+    private final FollowRepository followRepository;
     private final BoardImageRepository boardImageRepository;
     private final TagMapRepository tagMapRepository;
     private final MemberRepository memberRepository;
@@ -42,7 +42,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRequestDTO.toEntity(userDetails.getMember());
 
         //이미지 생성
-        if (!boardImages.isEmpty()) {
+        if (boardImages != null) {
             List<BoardImage> boardImageList = new ArrayList<>();
             List<String> imageUrl = imageService.uploadFileList(boardImages);
             for (String boardImage: imageUrl) {
@@ -51,17 +51,20 @@ public class BoardServiceImpl implements BoardService {
             board.changeBoardImageList(boardImageList);
         }
         //tag 생성
-        List<Tag> boardTagList = new ArrayList<>();
-        for (String tag: boardRequestDTO.getTag()){
-            boardTagList.add(boardRequestDTO.toEntity(tag));
+        if (boardRequestDTO.getTag() != null) {
+            List<Tag> boardTagList = new ArrayList<>();
+            for (String tag : boardRequestDTO.getTag()) {
+                boardTagList.add(boardRequestDTO.toEntity(tag));
+            }
+
+            tagRepository.saveAll(boardTagList);
+            //tagMap 생성
+            List<TagMap> tagMapList = new ArrayList<>();
+            for (Tag tag : boardTagList) {
+                tagMapList.add(boardRequestDTO.toEntity(board, tag));
+            }
+            board.changeTagMapList(tagMapList);
         }
-        tagRepository.saveAll(boardTagList);
-        //tagMap 생성
-        List<TagMap> tagMapList = new ArrayList<>();
-        for (Tag tag: boardTagList){
-         tagMapList.add(boardRequestDTO.toEntity(board, tag));
-        }
-        board.changeTagMapList(tagMapList);
         boardRepository.save(board);
 
         return ResponseDTO.builder()
@@ -70,30 +73,31 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
-    @Transactional//수정중
-    public ResponseDTO update(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages ,UserDetailsImpl userDetails) {
+    @Transactional
+    public ResponseDTO update(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages, UserDetailsImpl userDetails) {
+        // 게시글 조회
         Board board = boardRepository.findByBno(boardRequestDTO.getBno())
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_BOARD));
 
-        identification(board.getMember().getEmail(),userDetails.getEmail());
+        // 권한 확인
+        identification(board.getMember().getEmail(), userDetails.getEmail());
 
         // 유지할 기존 이미지
         Set<String> originImage = Optional.ofNullable(boardRequestDTO.getOriginImages())
                 .map(HashSet::new)
                 .orElse(new HashSet<>());
 
-        // 삭제할 이미지 추출
-        List<String> deleteImages = board.getBoardImageList().stream()
-                .map(BoardImage::getSrc)
-                .filter(src -> !originImage.contains(src)) // originImage에 포함되지 않은 이미지를 삭제 대상으로 필터링
+        // 삭제 대상 이미지 추출
+        List<BoardImage> deleteImages = board.getBoardImageList().stream()
+                .filter(image -> !originImage.contains(image.getSrc())) // 유지되지 않는 이미지를 필터링
                 .toList();
 
         // 삭제 대상 이미지 처리
         if (!deleteImages.isEmpty()) {
-            deleteImages.forEach(src -> {
-                boardImageRepository.deleteBySrc(src); // DB에서 삭제
-                imageService.deleteFile(src);          // S3에서 삭제
+            deleteImages.forEach(image -> {
+                imageService.deleteFile(image.getSrc()); // S3에서 삭제
             });
+            board.getBoardImageList().removeAll(deleteImages); // 리스트에서 제거
         }
 
         // 새 이미지 업로드 및 저장
@@ -105,16 +109,27 @@ public class BoardServiceImpl implements BoardService {
             board.getBoardImageList().addAll(newImages); // 새 이미지를 엔티티에 추가
         }
 
-        //테그 삭제 후 추가
-        List<TagMap> tagMaps = processTags(boardRequestDTO, board);
-        board.changeTagMapList(tagMaps);
+        // 태그 삭제 후 추가
+        if (boardRequestDTO.getTag() != null) {
+            List<TagMap> tagMaps = processTags(boardRequestDTO, board);
+            board.changeTagMapList(tagMaps);
+        }
 
-        //board 수정
-        board.changeContent(boardRequestDTO.getContent());
-        board.changeLikeVisible(boardRequestDTO.getIsLikeVisible());
-        board.changeReplyAllowed(boardRequestDTO.getIsReplyAllowed());
+        // 게시글 수정
+        if (boardRequestDTO.getContent() != null) {
+            board.changeContent(boardRequestDTO.getContent());
+        }
 
+        if (boardRequestDTO.getIsLikeVisible() != null) {
+            board.changeLikeVisible(boardRequestDTO.getIsLikeVisible());
+        }
+        if (boardRequestDTO.getIsReplyAllowed() != null) {
+            board.changeReplyAllowed(boardRequestDTO.getIsReplyAllowed());
+        }
+
+        // 변경 사항 저장
         boardRepository.save(board);
+
         return ResponseDTO.builder()
                 .message("게시글 수정 완료")
                 .build();
@@ -174,7 +189,7 @@ public class BoardServiceImpl implements BoardService {
                     .email(reply.getWriter().getEmail())
                     .nickName(reply.getWriter().getName())
                     .profilePicture(reply.getWriter().getProfileImage())
-                    .replyImage(reply.getReplyImage())
+                    .commentImage(reply.getReplyImage())
                     .numberOfLike(replyLikeRepository.countByReply(reply))
                     .numberOfComments(replyRepository.countByParent(reply))
                     .contents(reply.getText())
@@ -255,6 +270,9 @@ public class BoardServiceImpl implements BoardService {
                 .regDate(String.valueOf(board.getRegDate()))
                 .boardImages(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
                 .isLike(boardLikeRepository.existsByBoardAndMember(board, userDetails.getMember()))
+                .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(), board.getMember()))
+                .isReplyAllowed(board.getIsReplyAllowed())
+                .isLikeVisible(board.getIsLikeVisible())
                 .build();
     }
 

@@ -24,13 +24,13 @@ public class BoardController {
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardService.createBoard(boardRequestDTO,boardImages ,userDetails));
     }
-    @PostMapping("/update")
-    public ResponseEntity<ResponseDTO> update(@RequestBody BoardRequestDTO boardRequestDTO,
-                                              @RequestPart(value = "boardImages", required = false) List<MultipartFile> boardImages,
+    @PatchMapping("/update")
+    public ResponseEntity<ResponseDTO> update(@ModelAttribute BoardRequestDTO boardRequestDTO,
+                                              @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(boardService.update(boardRequestDTO,boardImages,userDetails));
+        return ResponseEntity.ok(boardService.update(boardRequestDTO,newImages,userDetails));
     }
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ResponseDTO> delete(@RequestParam Long bno,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardService.delete(bno, userDetails));
@@ -61,7 +61,7 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getRandomBoard(page,userDetails));
     }
 
-    @GetMapping("/detail")
+    @GetMapping("/detail/")
     public ResponseEntity<ResponseDTO> getDetailBoard(@RequestParam Long bno,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardService.getDetailBoard(bno, userDetails));

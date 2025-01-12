@@ -28,7 +28,7 @@ public class ReplyController {
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.updateReply(replyRequestDTO, userDetails, commentImage));
     }
-    @PostMapping("/delete")
+    @DeleteMapping("/delete")
     public ResponseEntity<ResponseDTO> deleteReply(@RequestParam Long rno,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.deleteReply(rno, userDetails));

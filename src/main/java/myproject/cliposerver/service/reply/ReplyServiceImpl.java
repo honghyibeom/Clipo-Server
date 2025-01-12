@@ -44,7 +44,8 @@ public class ReplyServiceImpl implements ReplyService {
                     .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_REPLY));
 
             Reply reply = replyRequestDTO.toEntity(board, userDetails.getMember(), parentReply);
-            if (commentImage != null && !commentImage.isEmpty()) {
+
+            if (commentImage != null) {
                 String getImage = imageService.uploadFile(commentImage);
                 reply.changeReplyImage(getImage);
             }
@@ -58,7 +59,7 @@ public class ReplyServiceImpl implements ReplyService {
         // 부모댓
         else {
             Reply reply = replyRequestDTO.toEntity(board, userDetails.getMember());
-            if (commentImage != null && !commentImage.isEmpty()) {
+            if (commentImage != null) {
                 String getImage = imageService.uploadFile(commentImage);
                 reply.changeReplyImage(getImage);
             }
@@ -155,12 +156,14 @@ public class ReplyServiceImpl implements ReplyService {
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
         for (Reply reply : result) {
             ReplyInfoResponseDTO replyInfoResponseDTO = ReplyInfoResponseDTO.builder()
+                    .parentRno(reply.getParent().getRno())
+                    .bno(reply.getBoard().getBno())
                     .rno(reply.getRno())
                     .typeOfPost(TypeOfPost.nestRe.name())
                     .email(reply.getWriter().getEmail())
                     .nickName(reply.getWriter().getName())
                     .profilePicture(reply.getWriter().getProfileImage())
-                    .replyImage(reply.getReplyImage())
+                    .commentImage(reply.getReplyImage())
                     .numberOfLike(replyLikeRepository.countByReply(reply))
                     .numberOfComments(replyRepository.countByParent(reply))
                     .contents(reply.getText())
@@ -180,11 +183,12 @@ public class ReplyServiceImpl implements ReplyService {
 
         return ReplyInfoResponseDTO.builder()
                 .rno(reply.getRno())
+                .bno(reply.getBoard().getBno())
                 .typeOfPost(TypeOfPost.reply.name())
                 .email(reply.getWriter().getEmail())
                 .nickName(reply.getWriter().getName())
                 .profilePicture(reply.getWriter().getProfileImage())
-                .replyImage(reply.getReplyImage())
+                .commentImage(reply.getReplyImage())
                 .numberOfLike(replyLikeRepository.countByReply(reply))
                 .numberOfComments(replyRepository.countByParent(reply))
                 .contents(reply.getText())

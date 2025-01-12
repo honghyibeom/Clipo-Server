@@ -15,22 +15,22 @@ public class LikeController {
     private final BoardLikeService boardLikeService;
     private final ReplyLikeService replyLikeService;
 
-    @PostMapping("/api/boardLike/like")
+    @PostMapping("/api/boardLike/like/")
     public ResponseEntity<ResponseDTO> boardLike(@RequestParam Long bno,
                                                  @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardLikeService.like(bno, userDetails));
     }
-    @PostMapping("/api/boardLike/unlike")
+    @PostMapping("/api/boardLike/unlike/")
     public ResponseEntity<ResponseDTO> boardUnlike(@RequestParam Long bno,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardLikeService.unlike(bno, userDetails));
     }
-    @PostMapping("/api/replyLike/like")
+    @PostMapping("/api/replyLike/like/")
     public ResponseEntity<ResponseDTO> ReplyLike(@RequestParam Long rno,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(replyLikeService.like(rno, userDetails));
     }
-    @PostMapping("/api/replyLike/unlike")
+    @PostMapping("/api/replyLike/unlike/")
     public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
