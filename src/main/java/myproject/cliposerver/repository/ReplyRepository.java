@@ -16,8 +16,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     Long countByBoard(Board board);
     Long countByParent(Reply reply);
     Page<Reply> findByWriterOrderByRegDateDesc(Member member, Pageable page);
-    Page<Reply> findByBoard(Board board, Pageable page);
-    Page<Reply> findByRno(Long rno, Pageable page);
+    Page<Reply> findByBoardOrderByRegDateDesc(Board board, Pageable page);
+    Page<Reply> findByParentRnoOrderByRegDateDesc(Long rno, Pageable page);
 
     Optional<Reply> findByRno(Long rno);
 
