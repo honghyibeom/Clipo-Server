@@ -13,6 +13,7 @@ public interface ReplyService {
     ResponseDTO deleteReply(Long rno, UserDetailsImpl userDetails);
     ResponseDTO getDetailReply(Long bno, int page, UserDetailsImpl userDetails);
     ResponseDTO getDetailChildReply(Long rno, int page, UserDetailsImpl userDetails);
+    ResponseDTO getDetailOneReply(Long rno, UserDetailsImpl userDetails);
 
 
 }

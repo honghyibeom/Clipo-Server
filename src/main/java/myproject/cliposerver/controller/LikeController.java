@@ -30,10 +30,17 @@ public class LikeController {
                                             @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(replyLikeService.like(rno, userDetails));
     }
-    @PostMapping("/api/replyLike/unlike/")
-    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
-                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
-    }
+//    @PostMapping("/api/replyLike/unlike/")
+//    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
+//                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
+//    }
+//
+//    @GetMapping("/api/boardLike/list")
+//    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
+//                                                   @AuthenticationPrincipal UserDetailsImpl userDetails){
+//        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
+//    }
+
 
 }

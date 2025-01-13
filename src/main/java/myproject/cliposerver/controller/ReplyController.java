@@ -18,13 +18,13 @@ public class ReplyController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseDTO> insertReply(@ModelAttribute ReplyRequestDTO replyRequestDTO,
-                                                   @RequestPart MultipartFile commentImage,
+                                                   @RequestPart(value = "commentImage", required = false) MultipartFile commentImage,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.createReply(replyRequestDTO, userDetails, commentImage));
     }
     @PatchMapping("/update")
     public ResponseEntity<ResponseDTO> updateReply(@ModelAttribute ReplyRequestDTO replyRequestDTO,
-                                                   @RequestPart MultipartFile commentImage,
+                                                   @RequestPart(value = "commentImage", required = false) MultipartFile commentImage,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.updateReply(replyRequestDTO, userDetails, commentImage));
     }
@@ -46,5 +46,11 @@ public class ReplyController {
                                                            @PathVariable("page") int page,
                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.getDetailChildReply(rno,page, userDetails));
+    }
+
+    @GetMapping("/detail/reply/one/")
+    public ResponseEntity<ResponseDTO> getDetailOneReply(@RequestParam("rno") Long rno,
+                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(replyService.getDetailOneReply(rno, userDetails));
     }
 }

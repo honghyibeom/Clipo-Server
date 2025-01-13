@@ -179,6 +179,19 @@ public class ReplyServiceImpl implements ReplyService {
                 .build();
     }
 
+    @Override
+    public ResponseDTO getDetailOneReply(Long rno, UserDetailsImpl userDetails) {
+        Reply reply = replyRepository.findById(rno)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_REPLY));
+
+        ReplyInfoResponseDTO replyInfoResponseDTO = getReplyInfoResponseDTO(userDetails, reply);
+
+        return ResponseDTO.builder()
+                .body(replyInfoResponseDTO)
+                .message("댓글정보 단일 조회")
+                .build();
+    }
+
     private ReplyInfoResponseDTO getReplyInfoResponseDTO(UserDetailsImpl userDetails, Reply reply) {
 
         return ReplyInfoResponseDTO.builder()

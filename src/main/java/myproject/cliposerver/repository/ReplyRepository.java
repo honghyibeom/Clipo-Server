@@ -19,5 +19,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
     Page<Reply> findByBoard(Board board, Pageable page);
     Page<Reply> findByRno(Long rno, Pageable page);
 
+    Optional<Reply> findByRno(Long rno);
+
 
 }
