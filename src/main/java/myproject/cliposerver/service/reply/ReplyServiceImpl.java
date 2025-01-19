@@ -81,7 +81,7 @@ public class ReplyServiceImpl implements ReplyService {
 
         // 이미지 삭제 및 추가
         // 파일이 존재하면 삭제 후 추가
-        if (commentImage != null && !commentImage.isEmpty()) {
+        if (commentImage != null) {
             if(replyRequestDTO.getOriginImage().isEmpty()) {
                 imageService.deleteFile(reply.getReplyImage());
                 String newImage = imageService.uploadFile(commentImage);
