@@ -116,8 +116,9 @@ public class ReplyServiceImpl implements ReplyService {
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_REPLY));
         identification(reply.getWriter().getEmail(), userDetails.getEmail());
 
-        imageService.deleteFile(reply.getReplyImage());
-
+        if (reply.getReplyImage() != null) {
+            imageService.deleteFile(reply.getReplyImage());
+        }
         replyRepository.delete(reply);
         return ResponseDTO.builder()
                 .message("댓글 삭제 완료")
@@ -131,7 +132,7 @@ public class ReplyServiceImpl implements ReplyService {
         Board board = boardRepository.findByBno(bno)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_BOARD));
 
-        Page<Reply> pages = replyRepository.findByBoardOrderByRegDateDesc(board, pageRequest);
+        Page<Reply> pages = replyRepository.findByBoardAndParentIsNullOrderByRegDateDesc(board, pageRequest);
         List<Reply> result = pages.getContent();
 
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();

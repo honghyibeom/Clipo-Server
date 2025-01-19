@@ -143,8 +143,10 @@ public class BoardServiceImpl implements BoardService {
 
         identification(board.getMember().getEmail(), userDetails.getEmail());
 
-        for (String fileName : board.getBoardImageList().stream().map(BoardImage :: getSrc).toList()) {
-            imageService.deleteFile(fileName);
+        if (board.getBoardImageList() != null) {
+            for (String fileName : board.getBoardImageList().stream().map(BoardImage::getSrc).toList()) {
+                imageService.deleteFile(fileName);
+            }
         }
 
         boardRepository.delete(board);
@@ -184,6 +186,7 @@ public class BoardServiceImpl implements BoardService {
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
         for (Reply reply : result) {
             ReplyInfoResponseDTO replyInfoResponseDTO = ReplyInfoResponseDTO.builder()
+                    .bno(reply.getBoard().getBno())
                     .rno(reply.getRno())
                     .typeOfPost(TypeOfPost.reply.name())
                     .email(reply.getWriter().getEmail())
