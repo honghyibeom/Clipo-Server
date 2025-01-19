@@ -48,7 +48,7 @@ public class ReplyController {
         return ResponseEntity.ok(replyService.getDetailChildReply(rno,page, userDetails));
     }
 
-    @GetMapping("/detail/reply/one/")
+    @GetMapping("/one/")
     public ResponseEntity<ResponseDTO> getDetailOneReply(@RequestParam("rno") Long rno,
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.getDetailOneReply(rno, userDetails));
