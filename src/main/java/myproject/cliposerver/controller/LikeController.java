@@ -30,17 +30,25 @@ public class LikeController {
                                             @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(replyLikeService.like(rno, userDetails));
     }
-//    @PostMapping("/api/replyLike/unlike/")
-//    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
-//                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
-//    }
-//
-//    @GetMapping("/api/boardLike/list")
-//    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
-//                                                   @AuthenticationPrincipal UserDetailsImpl userDetails){
-//        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
-//    }
+    @PostMapping("/api/replyLike/unlike/")
+    public ResponseEntity<ResponseDTO> ReplyUnlike(@RequestParam Long rno,
+                                              @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(replyLikeService.unlike(rno, userDetails));
+    }
+
+    @GetMapping("/api/boardLike/get/users/{page}")
+    public ResponseEntity<ResponseDTO> getBoardLikeList(@RequestParam("bno") Long bno,
+                                                        @PathVariable("page") int page,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(boardLikeService.boardLikeList(bno,page,userDetails));
+    }
+
+    @GetMapping("/api/replyLike/get/users/{page}")
+    public ResponseEntity<ResponseDTO> getReplyLikeList(@RequestParam("rno") Long rno,
+                                                        @PathVariable("page") int page,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return ResponseEntity.ok(replyLikeService.replyLikeList(rno,page,userDetails));
+    }
 
 
 }

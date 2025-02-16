@@ -53,4 +53,5 @@ public class ReplyController {
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.getDetailOneReply(rno, userDetails));
     }
+
 }

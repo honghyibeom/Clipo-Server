@@ -46,4 +46,11 @@ public class BoardLikeServiceImpl implements BoardLikeService {
                 .message("좋아요 취소 완료")
                 .build();
     }
+    @Override
+    public ResponseDTO boardLikeList(Long bno, int page, UserDetailsImpl userDetails) {
+
+        return ResponseDTO.builder()
+                .message("boardLike 유저들 목록 확인")
+                .build();
+    }
 }

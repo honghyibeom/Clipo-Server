@@ -9,6 +9,7 @@ import myproject.cliposerver.data.dto.auth.LoginRequestDTO;
 import myproject.cliposerver.data.dto.auth.LoginResponseDTO;
 import myproject.cliposerver.data.dto.auth.SignupRequestDTO;
 import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.enumerate.DefaultProfile;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.MemberRepository;

@@ -119,12 +119,26 @@ public class MemberServiceImpl implements MemberService {
     public ResponseDTO updateUserInfo(UserDetailsImpl userDetails, UpdateUserInfoRequestDTO requestDTO,
                                       MultipartFile profileImage, MultipartFile bgImage) {
         Member member = getUser(userDetails.getEmail())
-                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_USER));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
-        member.changeName(requestDTO.getNickName());
-        member.changeLocation(requestDTO.getLocation());
-        member.changeDescription(requestDTO.getDescription());
-        member.changeBirth(requestDTO.getBirthday());
+        // 빈 문자열도 null로 처리해서 무시하도록 변환
+        String nickName = convertBlankToNull(requestDTO.getNickName());
+        String location = convertBlankToNull(requestDTO.getLocation());
+        String description = convertBlankToNull(requestDTO.getDescription());
+        String birthday = convertBlankToNull(requestDTO.getBirthday());
+
+        if (nickName != null) {
+            member.changeName(nickName);
+        }
+        if (location != null) {
+            member.changeLocation(location);
+        }
+        if (description != null) {
+            member.changeDescription(description);
+        }
+        if (birthday != null) {
+            member.changeBirth(birthday);
+        }
 
         if (profileImage != null && !profileImage.isEmpty()) {
             if (member.getProfileImage() != null) {
@@ -145,6 +159,13 @@ public class MemberServiceImpl implements MemberService {
         return ResponseDTO.builder()
                 .message("유저편집 완료")
                 .build();
+    }
+
+    private String convertBlankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value;
     }
 
     private Optional<Member> getUser(String email) {

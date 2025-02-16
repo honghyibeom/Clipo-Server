@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.follow.FollowInfoResponseDTO;
+import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
@@ -60,7 +60,7 @@ public class FollowServiceImpl implements FollowService{
     @Override
     public ResponseDTO getUserFollower(String username, int page, UserDetailsImpl userDetails) {
         String gbn = "follower";
-        List<FollowInfoResponseDTO> responseList = getFollowInfoResponseDTOS(username, page, userDetails, gbn);
+        List<LittleUserInfoResponseDTO> responseList = getFollowInfoResponseDTOS(username, page, userDetails, gbn);
 
         return ResponseDTO.builder()
                 .message("팔로워 조회")
@@ -71,7 +71,7 @@ public class FollowServiceImpl implements FollowService{
     @Override
     public ResponseDTO getUserFollowing(String username, int page, UserDetailsImpl userDetails) {
         String gbn = "following";
-        List<FollowInfoResponseDTO> responseList = getFollowInfoResponseDTOS(username, page, userDetails, gbn);
+        List<LittleUserInfoResponseDTO> responseList = getFollowInfoResponseDTOS(username, page, userDetails, gbn);
 
         return ResponseDTO.builder()
                 .message("팔로잉 조회")
@@ -80,8 +80,8 @@ public class FollowServiceImpl implements FollowService{
     }
 
     @NotNull
-    private List<FollowInfoResponseDTO> getFollowInfoResponseDTOS(String username, int page, UserDetailsImpl userDetails,
-                                                                  String gbn) {
+    private List<LittleUserInfoResponseDTO> getFollowInfoResponseDTOS(String username, int page, UserDetailsImpl userDetails,
+                                                                      String gbn) {
         Member member = memberRepository.findByName(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
@@ -90,30 +90,30 @@ public class FollowServiceImpl implements FollowService{
         Page<Follow> followerPage = followRepository.findByFromMember(member,pageRequest);
         Page<Follow> followingPage = followRepository.findByToMember(member,pageRequest);
 
-        List<FollowInfoResponseDTO> responseList = new ArrayList<>();
+        List<LittleUserInfoResponseDTO> responseList = new ArrayList<>();
 
         if (gbn.equals("follower")){
             List<Follow> result = followingPage.getContent();
             for (Follow follow: result) {
-                FollowInfoResponseDTO followInfoResponseDTO = FollowInfoResponseDTO.builder()
+                LittleUserInfoResponseDTO littleUserInfoResponseDTO = LittleUserInfoResponseDTO.builder()
                         .profilePicture(follow.getFromMember().getProfileImage())
                         .nickName(follow.getFromMember().getName())
                         .email(follow.getFromMember().getEmail())
                         .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(),member))
                         .build();
-                responseList.add(followInfoResponseDTO);
+                responseList.add(littleUserInfoResponseDTO);
             }
         }
         else if (gbn.equals("following")) {
             List<Follow> result = followerPage.getContent();
             for (Follow follow: result) {
-                FollowInfoResponseDTO followInfoResponseDTO = FollowInfoResponseDTO.builder()
+                LittleUserInfoResponseDTO littleUserInfoResponseDTO = LittleUserInfoResponseDTO.builder()
                         .profilePicture(follow.getToMember().getProfileImage())
                         .nickName(follow.getToMember().getName())
                         .email(follow.getToMember().getEmail())
                         .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(),member))
                         .build();
-                responseList.add(followInfoResponseDTO);
+                responseList.add(littleUserInfoResponseDTO);
             }
         }
         return responseList;

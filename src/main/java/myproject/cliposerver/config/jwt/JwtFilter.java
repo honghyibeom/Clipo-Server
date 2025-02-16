@@ -39,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if (token != null) {
             String status = jwtTokenUtil.validateToken(token);
             if (!status.equals("pass")) {
-                if (!status.equals("만료된 JWT 토큰입니다.")){
+                if (!status.equals("expire")){
+                    //이 부분 잘못되었음..
                     returnErrorResponse(ErrorCode.EXPIRED_TOKEN, response);
                     return;
                 }
@@ -55,6 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     throw new CustomException(ErrorCode.FAIL_TO_CERTIFICATE);
                 }
             }
+
         }
         //원래 필터 체인으로 되돌리기
         filterChain.doFilter(request, response);

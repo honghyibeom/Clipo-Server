@@ -3,6 +3,7 @@ package myproject.cliposerver.data.dto.auth;
 import lombok.Builder;
 import lombok.Getter;
 import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.enumerate.DefaultProfile;
 import myproject.cliposerver.data.enumerate.Role;
 
 import javax.validation.constraints.Email;
@@ -22,7 +23,7 @@ public class SignupRequestDTO {
                 .password(password)
                 .name(null)
                 .phone(null)
-                .profileImage(null)
+                .profileImage(DefaultProfile.getRandomProfileImage())
                 .isValidate(false)
                 .isSocial(false)
                 .role(Role.USER)

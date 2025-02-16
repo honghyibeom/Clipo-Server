@@ -9,6 +9,5 @@ public interface FollowService {
     ResponseDTO follow(String toMemberEmail, UserDetailsImpl userDetails);
     ResponseDTO unfollow(String toMemberEmail, UserDetailsImpl userDetails);
     ResponseDTO getUserFollower(String username, int page, UserDetailsImpl userDetails);
-
     ResponseDTO getUserFollowing(String username, int page, UserDetailsImpl userDetails);
 }
