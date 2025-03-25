@@ -1,7 +1,7 @@
 # SpringBoot-Project-SNS
 - server -> springBoot
 - client -> React
-SNS 웹 + 모바일 프로젝트 입니다.
+SNS 웹 + 모바일 프로젝트 입니다. <br>
 이 프로젝트를 통해 자바와 리엑트 그리고 client-server 의 구조를 파악하였습니다.
 
 ## 🖥️ 프로젝트 소개
