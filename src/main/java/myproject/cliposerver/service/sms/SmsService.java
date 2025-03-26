@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface SmsService {
+    // 회원가입시 핸드폰 인증
     ResponseDTO verifySms(SmsCertificationRequestDTO requestDto);
+    // 문자 보내기
     ResponseDTO sendSms(SmsCertificationRequestDTO requestDto);
 }

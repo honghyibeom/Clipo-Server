@@ -6,8 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface FollowService {
+    // 팔로우
     ResponseDTO follow(String toMemberEmail, UserDetailsImpl userDetails);
+    // 팔로우 취소
     ResponseDTO unfollow(String toMemberEmail, UserDetailsImpl userDetails);
+    // 팔로워 조회
     ResponseDTO getUserFollower(String username, int page, UserDetailsImpl userDetails);
+    // 팔로잉 조회
     ResponseDTO getUserFollowing(String username, int page, UserDetailsImpl userDetails);
 }

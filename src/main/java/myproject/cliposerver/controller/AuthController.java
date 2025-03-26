@@ -1,6 +1,7 @@
 package myproject.cliposerver.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AuthController {
     private final SmsService smsService;
     private final Map<String, SocialLoginService> socialLoginInterMap;
 
+    @Operation(summary = "회원 가입", description = "유저 정보를 저장")
     @PostMapping("/auth/signup")
     public ResponseEntity<ResponseDTO> signup(@RequestBody @Validated SignupRequestDTO userSignupRequestDTO) {
         return ResponseEntity.ok(authService.signup(userSignupRequestDTO));

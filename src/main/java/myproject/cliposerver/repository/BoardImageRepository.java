@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
-    void deleteByBoard(Board board);
 
-    void deleteBySrc(String src);
 }

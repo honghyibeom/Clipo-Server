@@ -11,8 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
+    // 좋아요 취소
     void deleteByBoardAndMember(Board board, Member member);
+    // 좋아요 갯수
     Long countByBoard(Board board);
+    // 게시글을 좋아요 했는지 여부
     Boolean  existsByBoardAndMember(Board board, Member member);
 
 }
