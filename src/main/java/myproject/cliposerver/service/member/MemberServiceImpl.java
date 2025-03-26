@@ -161,6 +161,14 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
+    @Override
+    public ResponseDTO getUserForSearch(int page, UserDetailsImpl userDetails, String search) {
+        //유저 가져오기
+
+
+        return null;
+    }
+
     private String convertBlankToNull(String value) {
         if (value == null || value.isBlank()) {
             return null;

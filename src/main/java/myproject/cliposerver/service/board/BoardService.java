@@ -26,5 +26,8 @@ public interface BoardService {
     ResponseDTO getRandomBoard(int page,UserDetailsImpl userDetails);
     // 게시글 조회
     ResponseDTO getDetailBoard(Long bno,UserDetailsImpl userDetails);
+    // 테그로 게시글 검색(자동완성 x)
+    ResponseDTO getBoardForTag(int page,UserDetailsImpl userDetails, String tag);
+
 
 }

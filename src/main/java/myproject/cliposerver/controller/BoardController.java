@@ -66,5 +66,11 @@ public class BoardController {
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails){
         return ResponseEntity.ok(boardService.getDetailBoard(bno, userDetails));
     }
+    @GetMapping("/get/tag/{page}")
+    public ResponseEntity<ResponseDTO> getBoardForTag(@PathVariable("page") int page,
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                      @RequestParam(required = false, defaultValue = "") String search) {
+        return ResponseEntity.ok(boardService.getBoardForTag(page, userDetails, search));
+    }
 
 }

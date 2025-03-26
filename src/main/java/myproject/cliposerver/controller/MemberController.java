@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
-import myproject.cliposerver.data.dto.member.UpdateProfileNicknameRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.service.member.MemberService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +47,15 @@ public class MemberController {
                                                              ) {
         return ResponseEntity.ok(memberService.updateUserInfo(userDetails, requestDTO, profileImage, bgImage));
     }
+
+    @GetMapping("/search/get/users/{page}/")
+    public ResponseEntity<ResponseDTO> getUserForSearch(@PathVariable("page") int page,
+                                                        @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                        @RequestParam(required = false, defaultValue = "") String search) {
+        return ResponseEntity.ok(memberService.getUserForSearch(page,userDetails,search));
+    }
+
+
 
 
 }

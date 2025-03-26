@@ -30,7 +30,6 @@ public class BoardServiceImpl implements BoardService {
     private final ReplyRepository replyRepository;
     private final TagRepository tagRepository;
     private final FollowRepository followRepository;
-    private final BoardImageRepository boardImageRepository;
     private final TagMapRepository tagMapRepository;
     private final MemberRepository memberRepository;
     private final BoardLikeRepository boardLikeRepository;
@@ -243,6 +242,29 @@ public class BoardServiceImpl implements BoardService {
 
         return ResponseDTO.builder()
                 .message("메인페이지 조회")
+                .body(responseList)
+                .build();
+    }
+
+    @Override
+    public ResponseDTO getBoardForTag(int page, UserDetailsImpl userDetails, String tag) {
+        //테그를 찾자(tno)
+        Tag findTag = tagRepository.findByWord(tag)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+
+        //tno를 통해 mapId를 찾자
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        Page<TagMap> tagMapPages = tagMapRepository.findByTag(findTag, pageRequest);
+        List<TagMap> result = tagMapPages.getContent();
+
+        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+
+        for (TagMap tagMap : result) {
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(tagMap.getBoard(), userDetails);
+            responseList.add(boardInfoResponseDTO);
+        }
+        return ResponseDTO.builder()
+                .message("테그 검색결과 조회")
                 .body(responseList)
                 .build();
     }
