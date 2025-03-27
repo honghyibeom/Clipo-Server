@@ -2,6 +2,7 @@ package myproject.cliposerver.service.sms;
 
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.auth.PhoneNumberRequestDTO;
 import myproject.cliposerver.data.dto.sms.SmsCertificationRequestDTO;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
@@ -18,12 +19,12 @@ public class SmsServiceImpl implements SmsService {
     private final SmsCertificationDao smsCertificationDao;
     private final MemberRepository memberRepository;
 
-    public ResponseDTO sendSms(SmsCertificationRequestDTO requestDto){
-        String to = requestDto.getPhone();
+    public ResponseDTO sendSms(PhoneNumberRequestDTO PhoneNumberRequestDTO) {
+        String phoneNumber = PhoneNumberRequestDTO.getPhoneNumber();
         int randomNumber = (int) (Math.random() * 9000) + 1000;
         String certificationNumber = String.valueOf(randomNumber);
-        smsUtil.sendOne(to, certificationNumber);
-        smsCertificationDao.createSmsCertification(to,certificationNumber);
+        smsUtil.sendOne(phoneNumber, certificationNumber);
+        smsCertificationDao.createSmsCertification(phoneNumber,certificationNumber);
 
         return ResponseDTO.builder()
                 .message("메세지 발송!")

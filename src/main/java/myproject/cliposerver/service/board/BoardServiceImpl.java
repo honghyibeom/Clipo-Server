@@ -250,7 +250,7 @@ public class BoardServiceImpl implements BoardService {
     public ResponseDTO getBoardForTag(int page, UserDetailsImpl userDetails, String tag) {
         //테그를 찾자(tno)
         Tag findTag = tagRepository.findByWord(tag)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_TAG));
 
         //tno를 통해 mapId를 찾자
         PageRequest pageRequest = PageRequest.of(page, 10);
@@ -264,7 +264,7 @@ public class BoardServiceImpl implements BoardService {
             responseList.add(boardInfoResponseDTO);
         }
         return ResponseDTO.builder()
-                .message("테그 검색결과 조회")
+                .message("테그로 게시글 검색결과")
                 .body(responseList)
                 .build();
     }

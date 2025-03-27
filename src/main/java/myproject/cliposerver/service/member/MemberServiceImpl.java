@@ -8,6 +8,7 @@ import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
 import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
+import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
@@ -15,10 +16,15 @@ import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.FollowRepository;
 import myproject.cliposerver.repository.MemberRepository;
 import myproject.cliposerver.service.Image.S3ImageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -164,9 +170,30 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public ResponseDTO getUserForSearch(int page, UserDetailsImpl userDetails, String search) {
         //유저 가져오기
+        PageRequest pageRequest = PageRequest.of(page, 6);
+        Page<Member> memberPages = memberRepository.findBySearch(search, pageRequest);
 
+        if (memberPages.isEmpty()) {
+            return ResponseDTO.builder()
+                    .message("유저가 없습니다.")
+                    .build();
+        }
+        List<Member> result = memberPages.getContent();
 
-        return null;
+        List<UserInfoResponseDTO> responseList = new ArrayList<>();
+        for (Member member : result) {
+            UserInfoResponseDTO userInfoResponseDTO = UserInfoResponseDTO.builder()
+                    .email(member.getEmail())
+                    .nickName(member.getName())
+                    .profilePicture(member.getProfileImage())
+                    .build();
+            responseList.add(userInfoResponseDTO);
+        }
+
+        return ResponseDTO.builder()
+                .body(responseList)
+                .message("유저 검색 결과")
+                .build();
     }
 
     private String convertBlankToNull(String value) {

@@ -6,6 +6,7 @@ import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.service.member.MemberService;
+import myproject.cliposerver.service.tag.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MemberController {
-
     private final MemberService memberService;
+    private final TagService tagService;
 
     @PostMapping(value = "/update/profileNickname")
     public ResponseEntity<ResponseDTO> updateProfileNickname(@RequestPart("nickName") String username,
@@ -52,10 +53,6 @@ public class MemberController {
     public ResponseEntity<ResponseDTO> getUserForSearch(@PathVariable("page") int page,
                                                         @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                         @RequestParam(required = false, defaultValue = "") String search) {
-        return ResponseEntity.ok(memberService.getUserForSearch(page,userDetails,search));
-    }
-
-
-
-
+            return ResponseEntity.ok(memberService.getUserForSearch(page, userDetails, search));
+        }
 }

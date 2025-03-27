@@ -27,7 +27,9 @@ public enum ErrorCode {
     FAIL_TO_CERTIFICATE("인증 요청이 정상적으로 실행되지 않았습니다.",HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN("토큰이 만료되었습니다.", HttpStatus.FORBIDDEN),
     S3_CHECK_FILE_EXISTENCE_EXCEPTION("S3_CHECK_FILE_EXISTENCE_EXCEPTION", HttpStatus.BAD_REQUEST),
-    EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST);
+    EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST),
+    NOT_EXIST_TAG("테그가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+
 
     private final HttpStatus httpStatus;
     private final String errorMessage;
