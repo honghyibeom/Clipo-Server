@@ -7,7 +7,6 @@ import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.service.member.MemberService;
-import myproject.cliposerver.service.tag.TagService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
