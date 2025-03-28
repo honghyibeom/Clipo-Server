@@ -53,11 +53,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(loginRequestDTO));
     }
 
+    @Operation(summary = "비밀번호 제생성", description = "임시 비밀번호 발급")
     @PostMapping("/auth/recreatePassword/{phone}")
     public ResponseEntity<ResponseDTO> recreatePassword(@PathVariable("phone") String phone) throws MessagingException, UnsupportedEncodingException {
         return ResponseEntity.ok(authService.forgetPassword(phone));
     }
 
+    @Operation(summary = "토큰 재발급", description = "토큰 재발급, refreshToken 입력")
     @PostMapping("/auth/recreate/accessToken")
     public ResponseEntity<ResponseDTO> recreateAccessToken(HttpServletRequest request) {
         return ResponseEntity.ok(authService.recreateAccessToken(request));

@@ -164,6 +164,7 @@ public class BoardServiceImpl implements BoardService {
         List<Board> result = pages.getContent();
         List<BoardInfoResponseDTO> responseList = new ArrayList<>();
         for (Board board : result) {
+            //userDatils가 들어가는 이유는 내가 좋아요했는지 여부를 알아보기 위해서다.
             BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }

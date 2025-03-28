@@ -1,6 +1,6 @@
 package myproject.cliposerver.controller;
 
-import jakarta.websocket.server.PathParam;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class TagController {
     private final TagService tagService;
 
+    @Operation(summary = "테그 검색", description = "테그를 검색하는 api")
     @GetMapping("/get/{page}/")
     public ResponseEntity<ResponseDTO> getTagForSearch(@PathVariable("page") int page,
                                                        @AuthenticationPrincipal UserDetailsImpl userDetails,

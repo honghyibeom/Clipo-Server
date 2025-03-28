@@ -8,7 +8,6 @@ import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
 import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
-import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;

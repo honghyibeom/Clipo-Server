@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SocialLoginDTO {
+
     private String code;
     private String typeOfPlatform;
 }

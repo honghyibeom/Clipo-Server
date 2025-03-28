@@ -5,14 +5,11 @@ import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.tag.SearchTagResponseDTO;
-import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Tag;
 import myproject.cliposerver.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -13,9 +13,9 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Builder
 public class SignupRequestDTO {
+    @Schema(description = "사용자 이메일", example = "user@example.com")
     @Email(message = "do not match email form")
     @NotBlank(message = "email cannot be blank")
-    @Schema(description = "사용자 이메일", example = "user@example.com")
     private String email;
     @Schema(description = "사용자 비밀번호", example = "securePassword123@")
     private String password;

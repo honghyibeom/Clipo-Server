@@ -1,5 +1,6 @@
 package myproject.cliposerver.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.exception.CustomException;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class ImageController {
     private final S3ImageService s3ImageService;
+    @Operation(summary = "이미지 업로드 테스트",description = "이미지 업로드 테스트 api")
     @PostMapping(value = "/s3/upload")
     public List<String> s3Upload(@RequestPart List<MultipartFile> files){
         if (files == null) {
