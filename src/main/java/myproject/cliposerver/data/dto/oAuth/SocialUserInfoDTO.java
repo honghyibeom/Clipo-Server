@@ -3,6 +3,7 @@ package myproject.cliposerver.data.dto.oAuth;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.enumerate.DefaultProfile;
 import myproject.cliposerver.data.enumerate.Role;
 
 @Getter
@@ -24,6 +25,7 @@ public class SocialUserInfoDTO {
         return Member.builder()
                 .email(socialUserInfoDto.getEmail())
                 .password(null)
+                .profileImage(DefaultProfile.getRandomProfileImage())
                 .name(null)
                 .phone(socialUserInfoDto.getMobile())
                 .isValidate(true)
