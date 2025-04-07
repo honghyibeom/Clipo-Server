@@ -17,7 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByName(String nickName);
     Optional<Member> findByPhone(String phone);
 
-    @Query("select member from member where name like :search% ")
+    @Query("select m from member m where m.name like :search ")
     Page<Member> findBySearch(@Param("search") String search, Pageable pageable);
 
 }

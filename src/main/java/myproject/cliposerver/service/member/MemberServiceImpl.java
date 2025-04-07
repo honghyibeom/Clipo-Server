@@ -170,7 +170,7 @@ public class MemberServiceImpl implements MemberService {
     public ResponseDTO getUserForSearch(int page, UserDetailsImpl userDetails, String search) {
         //유저 가져오기
         PageRequest pageRequest = PageRequest.of(page, 6);
-        Page<Member> memberPages = memberRepository.findBySearch(search, pageRequest);
+        Page<Member> memberPages = memberRepository.findBySearch(search + "%", pageRequest);
 
         if (memberPages.isEmpty()) {
             return ResponseDTO.builder()

@@ -14,6 +14,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     //테그 검색
     Optional<Tag> findByWord(String word);
 
-    @Query("select tag from tag where word like :search% ")
+    @Query("select t from tag t where t.word like :search ")
     Page<Tag> findBySearch(@Param("search") String search, Pageable pageable);
 }
