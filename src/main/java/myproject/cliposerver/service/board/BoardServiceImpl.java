@@ -250,12 +250,18 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public ResponseDTO getBoardForTag(int page, UserDetailsImpl userDetails, String tag) {
         //테그를 찾자(tno)
-        Tag findTag = tagRepository.findByWord(tag)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_TAG));
+        Optional<Tag> findTag = tagRepository.findByWord(tag);
+
+        if (findTag.isEmpty()) {
+            return ResponseDTO.builder()
+                    .message("테그가 없습니다.")
+                    .body(Collections.emptyList())
+                    .build();
+        }
 
         //tno를 통해 mapId를 찾자
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<TagMap> tagMapPages = tagMapRepository.findByTag(findTag, pageRequest);
+        Page<TagMap> tagMapPages = tagMapRepository.findByTag(findTag.get(), pageRequest);
         List<TagMap> result = tagMapPages.getContent();
 
         List<BoardInfoResponseDTO> responseList = new ArrayList<>();

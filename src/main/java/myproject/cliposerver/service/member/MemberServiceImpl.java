@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,11 +173,12 @@ public class MemberServiceImpl implements MemberService {
         PageRequest pageRequest = PageRequest.of(page, 6);
         Page<Member> memberPages = memberRepository.findBySearch(search + "%", pageRequest);
 
-        if (memberPages.isEmpty()) {
-            return ResponseDTO.builder()
-                    .message("유저가 없습니다.")
-                    .build();
-        }
+//        if (memberPages.isEmpty()) {
+//            return ResponseDTO.builder()
+//                    .message("유저가 없습니다.")
+//                    .body(Collections.emptyList()) // 무한 스크롤할 때 array의 갯수로 판단을 한다해서 빈 배열을 보냄
+//                    .build();
+//        }
         List<Member> result = memberPages.getContent();
 
         List<UserInfoResponseDTO> responseList = new ArrayList<>();

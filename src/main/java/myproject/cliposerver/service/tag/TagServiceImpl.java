@@ -24,11 +24,11 @@ public class TagServiceImpl implements TagService {
         PageRequest pageRequest = PageRequest.of(page, 6);
         Page<Tag> tagPages = tagRepository.findBySearch(search + "%",pageRequest);
 
-        if (tagPages.isEmpty()) {
-            return ResponseDTO.builder()
-                    .message("테그가 없습니다.")
-                    .build();
-        }
+//        if (tagPages.isEmpty()) {
+//            return ResponseDTO.builder()
+//                    .message("테그가 없습니다.")
+//                    .build();
+//        }
         List<Tag> result = tagPages.getContent();
 
         // 객체 리스트를 String[]로 만드는 작업
