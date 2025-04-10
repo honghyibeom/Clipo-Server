@@ -43,6 +43,12 @@ public class Reply extends BaseEntity {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reply> children = new ArrayList<>(); // Child replies
 
+    @Builder.Default
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notificationList  = new ArrayList<>();
+
+
+
     public void changeText(String text) {
         this.text = text;
     }

@@ -44,6 +44,10 @@ public class Board extends BaseEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardLike> boardLikeList  = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notificationList  = new ArrayList<>();
+
     public void changeContent(String content) {
         this.content = content;
     }

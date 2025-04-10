@@ -67,6 +67,14 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReplyLike> replyLikeList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "receiverMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> receiverList  = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "senderMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> senderList  = new ArrayList<>();
+
 
     public void changePassword(String password) {
         this.password = password;
