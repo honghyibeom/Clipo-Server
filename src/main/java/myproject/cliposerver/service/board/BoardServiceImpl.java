@@ -250,7 +250,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public ResponseDTO getBoardForTag(int page, UserDetailsImpl userDetails, String tag) {
         //테그를 찾자(tno)
-        Optional<Tag> findTag = tagRepository.findByWord(tag);
+        Optional<Tag> findTag = tagRepository.findFirstByWord(tag);
 
         if (findTag.isEmpty()) {
             return ResponseDTO.builder()

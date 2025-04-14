@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {
     //테그 검색
-    Optional<Tag> findByWord(String word);
+    Optional<Tag> findFirstByWord(String word);
 
     @Query("select t from tag t where t.word like :search ")
     Page<Tag> findBySearch(@Param("search") String search, Pageable pageable);

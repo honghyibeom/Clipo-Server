@@ -24,11 +24,11 @@ public class TagServiceImpl implements TagService {
         PageRequest pageRequest = PageRequest.of(page, 6);
         Page<Tag> tagPages = tagRepository.findBySearch(search + "%",pageRequest);
 
-//        if (tagPages.isEmpty()) {
-//            return ResponseDTO.builder()
-//                    .message("테그가 없습니다.")
-//                    .build();
-//        }
+        if (tagPages.isEmpty()) {
+            return ResponseDTO.builder()
+                    .message("테그가 없습니다.")
+                    .build();
+        }
         List<Tag> result = tagPages.getContent();
 
         // 객체 리스트를 String[]로 만드는 작업
@@ -36,12 +36,14 @@ public class TagServiceImpl implements TagService {
         for (int i = 0; i < result.size(); i++) {
             tags[i] = result.get(i).getWord();
         }
-        SearchTagResponseDTO searchTagResponseDTO = SearchTagResponseDTO.builder()
-                .tags(tags)
-                .build();
+        //프론트맨이 지금까지 모든 파싱과정을 body하고 바로 배열로 하는걸로해버려서
+        //이걸 한번에 못고치겠다고 하여 tags를 없애고 배열만 전달해야댐..
+//        SearchTagResponseDTO searchTagResponseDTO = SearchTagResponseDTO.builder()
+//                .tags(tags)
+//                .build();
 
         return ResponseDTO.builder()
-                .body(searchTagResponseDTO)
+                .body(tags)
                 .message("테그 검색 결과")
                 .build();
     }
