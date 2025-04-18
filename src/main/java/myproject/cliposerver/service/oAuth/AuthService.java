@@ -96,7 +96,7 @@ public class AuthService {
         String refreshToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         Member member = memberRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_VALIDATE_TOKEN));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_VALIDATE_REFRESH_TOKEN));
 
         String accessToken = jwtTokenUtil.createToken(member);
         member.changeAccessToken(accessToken);
