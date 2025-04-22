@@ -2,11 +2,17 @@ package myproject.cliposerver.service.notification;
 
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.notification.NoteInfoRequestDTO;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Service
 public interface NotificationService {
-    ResponseDTO insertNotification(NoteInfoRequestDTO noteInfoRequestDTO, UserDetailsImpl userDetails);
+    //활동기록 조회
+    ResponseDTO getNotification(UserDetailsImpl userDetails);
+
+    //sse연결
+    SseEmitter subscribe(UserDetailsImpl userDetails);
+
+    //sse전송
+    void sendNotification(String email, String message);
 }

@@ -4,22 +4,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.notification.NoteInfoRequestDTO;
-import myproject.cliposerver.data.entity.Board;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
 import myproject.cliposerver.data.entity.Notification;
-import myproject.cliposerver.data.entity.Reply;
-import myproject.cliposerver.exception.CustomException;
-import myproject.cliposerver.exception.ErrorCode;
-import myproject.cliposerver.repository.BoardRepository;
+import myproject.cliposerver.data.enumerate.NoteEnum;
+import myproject.cliposerver.repository.FollowRepository;
 import myproject.cliposerver.repository.NotificationRepository;
-import myproject.cliposerver.repository.ReplyRepository;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -27,71 +25,73 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
-    private final BoardRepository boardRepository;
-    private final ReplyRepository replyRepository;
-
+    private final FollowRepository followRepository;
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+
     @Override
-    public ResponseDTO insertNotification(NoteInfoRequestDTO noteInfoRequestDTO, UserDetailsImpl userDetails) {
-        if (noteInfoRequestDTO.getBoardId() == null && noteInfoRequestDTO.getReplyId() == null) {
-            throw new CustomException(ErrorCode.WRONG_REQUEST);
-        }
+    public ResponseDTO getNotification(UserDetailsImpl userDetails) {
+        //알림 기록을 가져옴
+        List<Notification> result = notificationRepository.getNotificationsByReceiver(userDetails.getMember());
 
-        if (noteInfoRequestDTO.getBoardId() == null) {
-            Optional<Reply> replyResult = replyRepository.findByRno(noteInfoRequestDTO.getReplyId());
-            if(replyResult == null) {
-                throw new CustomException(ErrorCode.NOT_EXIST_REPLY);
-            }
-            Notification notification = Notification.builder()
-                    .reply(replyResult.get())
-                    .type(noteInfoRequestDTO.getType())
-                    .createdAt(LocalDateTime.now())
-                    .receiverMno(replyResult.get().getWriter())
-                    .senderMno(userDetails.getMember())
-                    .build();
-            notificationRepository.save(notification);
-        }
-
-        else if (noteInfoRequestDTO.getReplyId() == null) {
-            Optional<Board> boardResult = boardRepository.findByBno(noteInfoRequestDTO.getBoardId());
-            if(boardResult == null) {
-                throw new CustomException(ErrorCode.NOT_EXIST_REPLY);
-            }
-            Notification notification = Notification.builder()
-                    .board(boardResult.get())
-                    .type(noteInfoRequestDTO.getType())
-                    .createdAt(LocalDateTime.now())
-                    .receiverMno(boardResult.get().getMember())
-                    .senderMno(userDetails.getMember())
-                    .build();
-            notificationRepository.save(notification);
-        }
+        List<NoteInfoResponseDTO> noteInfoResponseDTOList = result.stream().map(noti ->
+                NoteInfoResponseDTO.builder()
+                        .type(noti.getType())
+                        .bno(noti.getBoard() != null ? noti.getBoard().getBno() : null)
+                        .boardOneImage(noti.getBoard() != null
+                                    && noti.getBoard().getBoardImageList() != null
+                                    ? noti.getBoard().getBoardImageList().get(0).getSrc()
+                                    : null)
+                        .rno(noti.getReply() != null ? noti.getReply().getRno() : null)
+                        .email(noti.getSender().getEmail())
+                        .userProfileImage(noti.getSender().getProfileImage())
+                        .isFollowing(noti.getType().equals(NoteEnum.follow.getType()) ?
+                                followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender())
+                                : null)
+                        .createAt(LocalDateTime.now())
+                        .build()).toList();
 
         return ResponseDTO.builder()
-                .message("알림 생성완료")
+                .message("활동기록 조회")
+                .body(noteInfoResponseDTOList)
                 .build();
     }
 
-//    public SseEmitter subscribe(String email) {
-//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
-//        emitters.put(email, emitter);
-//
-//        emitter.onCompletion(() -> emitters.remove(email));
-//        emitter.onTimeout(() -> emitters.remove(email));
-//
-//        return emitter;
-//    }
+    @Scheduled(cron = "0 0 3 * * ?") // 매일 새벽 3시에 실행
+    @Transactional
+    public void deleteOldNotifications() {
+        LocalDateTime threshold = LocalDateTime.now().minusDays(30);
+        notificationRepository.deleteByCreatedAtBefore(threshold);
+    }
 
-//    public void sendNotification(UserDetailsImpl userDetails) {
-//        SseEmitter emitter = emitters.get(userDetails.getMember().getEmail());
-//        if (emitter != null) {
-//            try {
-//                emitter.send(SseEmitter.event()
-//                        .name("notification")
-//                        .data();
-//            } catch (IOException e) {
-//                emitters.remove(userDetails.getMember().getEmail());
-//            }
-//        }
-//    }
+    public SseEmitter subscribe(UserDetailsImpl userDetails) {
+        SseEmitter emitter = new SseEmitter(60 * 1000L); // 1분 유지
+        emitters.put(userDetails.getEmail(), emitter);
+
+        emitter.onCompletion(() -> emitters.remove(userDetails.getEmail()));
+        emitter.onTimeout(() -> emitters.remove(userDetails.getEmail()));
+
+        // 연결 확인을 위한 더미 데이터
+        try {
+            emitter.send(SseEmitter.event().name("connect").data("connected"));
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+
+        return emitter;
+    }
+
+    // 알림을 언제 줘야하는지 정해야됨.
+    public void sendNotification(String email, String message) {
+        SseEmitter emitter = emitters.get(email);
+        if (emitter != null) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("notification")
+                        .data(message));
+            } catch (IOException e) {
+                emitter.completeWithError(e);
+                emitters.remove(email);
+            }
+        }
+    }
 }

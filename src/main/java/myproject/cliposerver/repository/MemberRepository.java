@@ -20,4 +20,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from member m where m.name like :search ")
     Page<Member> findBySearch(@Param("search") String search, Pageable pageable);
 
+    void deleteByIsValidate(Boolean isValidate);
+
 }

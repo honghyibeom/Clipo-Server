@@ -22,6 +22,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +67,7 @@ public class GoogleLoginServiceImpl implements SocialLoginService {
             String createToken = jwtUtil.createToken(existData.get());
             String refreshToken = jwtUtil.createRefreshToken();
             existData.get().changeToken(createToken, refreshToken);
+            existData.get().changeLastLoginAt(LocalDateTime.now());
             memberRepository.save(existData.get());
             return getResponseDTO(createToken, refreshToken);
         }

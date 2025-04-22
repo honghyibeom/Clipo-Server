@@ -5,6 +5,7 @@ import lombok.*;
 import myproject.cliposerver.data.enumerate.Role;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,8 @@ public class Member extends BaseEntity {
     private String refreshToken;
     @ColumnDefault("false")
     private Boolean isValidate;
+    @Column(nullable = true)
+    private LocalDateTime lastLoginAt;
 
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -120,4 +123,6 @@ public class Member extends BaseEntity {
     public void changeBackgroundImage(String backgroundImage) {
         this.backgroundImage = backgroundImage;
     }
+
+    public void changeLastLoginAt(LocalDateTime lastLoginAt) {this.lastLoginAt = lastLoginAt;}
 }

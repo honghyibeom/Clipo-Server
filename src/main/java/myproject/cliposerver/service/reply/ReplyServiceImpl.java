@@ -7,20 +7,26 @@ import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyRequestDTO;
 import myproject.cliposerver.data.entity.Board;
+import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.entity.Notification;
 import myproject.cliposerver.data.entity.Reply;
+import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.data.enumerate.TypeOfPost;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.BoardRepository;
+import myproject.cliposerver.repository.NotificationRepository;
 import myproject.cliposerver.repository.ReplyLikeRepository;
 import myproject.cliposerver.repository.ReplyRepository;
 import myproject.cliposerver.service.Image.S3ImageService;
+import myproject.cliposerver.service.notification.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +38,8 @@ public class ReplyServiceImpl implements ReplyService {
     private final BoardRepository boardRepository;
     private final ReplyLikeRepository replyLikeRepository;
     private final S3ImageService imageService;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ResponseDTO createReply(ReplyRequestDTO replyRequestDTO, UserDetailsImpl userDetails, MultipartFile commentImage) {
@@ -51,11 +59,15 @@ public class ReplyServiceImpl implements ReplyService {
             }
             replyRepository.save(reply);
 
+            //알림 생성
+            insertNotification(userDetails.getMember(), reply);
+
             return ResponseDTO.builder()
                     .message("자식 댓글 생성 완료")
                     .body(reply.getRno())
                     .build();
         }
+
         // 부모댓
         else {
             Reply reply = replyRequestDTO.toEntity(board, userDetails.getMember());
@@ -64,6 +76,9 @@ public class ReplyServiceImpl implements ReplyService {
                 reply.changeReplyImage(getImage);
             }
             replyRepository.save(reply);
+
+            //알림 생성
+            insertNotification(userDetails.getMember(), reply);
 
             return ResponseDTO.builder()
                     .message("댓글 생성 완료")
@@ -216,4 +231,21 @@ public class ReplyServiceImpl implements ReplyService {
             throw new CustomException(ErrorCode.NOT_EQUALS_USER);
         }
     }
+
+    private void insertNotification(Member sender, Reply reply) {
+        Notification notification = Notification.builder()
+                .type(NoteEnum.reply.name())
+                .sender(sender)
+                .board(reply.getBoard())
+                .reply(reply)
+                .receiver(reply.getWriter())
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationRepository.save(notification);
+
+        // 알림 전달
+        notificationService.sendNotification(reply.getWriter().getEmail(), "notification");
+    }
+
 }

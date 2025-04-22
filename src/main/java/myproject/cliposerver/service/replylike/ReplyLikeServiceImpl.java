@@ -5,18 +5,24 @@ import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
+import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.entity.Notification;
 import myproject.cliposerver.data.entity.Reply;
 import myproject.cliposerver.data.entity.ReplyLike;
+import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.FollowRepository;
+import myproject.cliposerver.repository.NotificationRepository;
 import myproject.cliposerver.repository.ReplyLikeRepository;
 import myproject.cliposerver.repository.ReplyRepository;
+import myproject.cliposerver.service.notification.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +33,8 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
     private final ReplyRepository replyRepository;
     private final ReplyLikeRepository replyLikeRepository;
     private final FollowRepository followRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ResponseDTO like(Long rno, UserDetailsImpl userDetails) {
@@ -38,6 +46,9 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
                 .reply(reply)
                 .build();
         replyLikeRepository.save(replyLike);
+
+        //알림테이블에 추가
+        insertNotification(userDetails.getMember(), reply);
 
         return ResponseDTO.builder()
                 .message("좋아요 완료")
@@ -78,6 +89,21 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
                 .message("boardLike 유저들 목록 확인")
                 .body(responseDTOS)
                 .build();
+    }
+    private void insertNotification(Member sender, Reply reply) {
+        Notification notification = Notification.builder()
+                .type(NoteEnum.like.name())
+                .sender(sender)
+                .board(reply.getBoard())
+                .reply(reply)
+                .receiver(reply.getWriter())
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationRepository.save(notification);
+
+        // 알림 전달
+        notificationService.sendNotification(reply.getWriter().getEmail(), "notification");
     }
 }
 

@@ -39,21 +39,23 @@ public class JwtFilter extends OncePerRequestFilter {
         if (token != null) {
             String status = jwtTokenUtil.validateToken(token);
             if (!status.equals("pass")) {
-                if (status.equals("expire")){
-                    returnErrorResponse(ErrorCode.EXPIRED_TOKEN, response);
-                    return;
-                }
-                if (status.equals("잘못된 JWT 서명입니다.")){
-                    returnErrorResponse(ErrorCode.INVALID_SIGNATURE_TOKEN, response);
-                    return;
-                }
-                if (status.equals("지원되지 않는 JWT 토큰입니다.")){
-                    returnErrorResponse(ErrorCode.UNSUPPORTED_TOKEN, response);
-                    return;
-                }
-                if (status.equals("JWT 토큰이 잘못되었습니다.")){
-                    returnErrorResponse(ErrorCode.MALFORMED_TOKEN, response);
-                    return;
+                switch (status) {
+                    case "expire" -> {
+                        returnErrorResponse(ErrorCode.EXPIRED_TOKEN, response);
+                        return;
+                    }
+                    case "잘못된 JWT 서명입니다." -> {
+                        returnErrorResponse(ErrorCode.INVALID_SIGNATURE_TOKEN, response);
+                        return;
+                    }
+                    case "지원되지 않는 JWT 토큰입니다." -> {
+                        returnErrorResponse(ErrorCode.UNSUPPORTED_TOKEN, response);
+                        return;
+                    }
+                    case "JWT 토큰이 잘못되었습니다." -> {
+                        returnErrorResponse(ErrorCode.MALFORMED_TOKEN, response);
+                        return;
+                    }
                 }
                 returnErrorResponse(ErrorCode.NOT_VALIDATE_TOKEN, response);
                 return;

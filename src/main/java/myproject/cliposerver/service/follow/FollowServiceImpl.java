@@ -5,18 +5,24 @@ import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.InsertNoteDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
+import myproject.cliposerver.data.entity.Notification;
+import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.FollowRepository;
 import myproject.cliposerver.repository.MemberRepository;
+import myproject.cliposerver.repository.NotificationRepository;
+import myproject.cliposerver.service.notification.NotificationService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -25,17 +31,22 @@ import java.util.List;
 public class FollowServiceImpl implements FollowService{
     private final FollowRepository followRepository;
     private final MemberRepository memberRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ResponseDTO follow(String toMemberEmail, UserDetailsImpl userDetails) {
-        Member Member = memberRepository.findByName(toMemberEmail)
+        Member member = memberRepository.findByName(toMemberEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
         Follow follow = Follow.builder()
                 .fromMember(userDetails.getMember())
-                .toMember(Member)
+                .toMember(member)
                 .build();
         followRepository.save(follow);
+
+        //알림테이블에 추가
+        insertNotification(member, userDetails);
 
         return ResponseDTO.builder()
                 .message("팔로우 완료")
@@ -117,5 +128,19 @@ public class FollowServiceImpl implements FollowService{
             }
         }
         return responseList;
+    }
+
+    private void insertNotification(Member toMember, UserDetailsImpl userDetails) {
+        Notification notification = Notification.builder()
+                .type(NoteEnum.follow.name())
+                .sender(userDetails.getMember())
+                .receiver(toMember)
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+        notificationRepository.save(notification);
+
+        // 알림 전달
+        notificationService.sendNotification(toMember.getEmail(), "notification");
     }
 }

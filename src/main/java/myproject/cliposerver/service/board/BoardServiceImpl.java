@@ -9,17 +9,20 @@ import myproject.cliposerver.data.dto.board.BoardRequestDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.*;
 
+import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.data.enumerate.TypeOfPost;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.*;
 import myproject.cliposerver.service.Image.S3ImageService;
+import myproject.cliposerver.service.notification.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -35,6 +38,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardLikeRepository boardLikeRepository;
     private final ReplyLikeRepository replyLikeRepository;
     private final S3ImageService imageService;
+    private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages , UserDetailsImpl userDetails){
@@ -65,6 +70,9 @@ public class BoardServiceImpl implements BoardService {
             board.changeTagMapList(tagMapList);
         }
         boardRepository.save(board);
+
+        //알림기록 생성
+        insertNotification(userDetails.getMember(), board);
 
         return ResponseDTO.builder()
                 .message("게시글 생성")
@@ -183,9 +191,7 @@ public class BoardServiceImpl implements BoardService {
         Page<Reply> pages = replyRepository.findByWriterOrderByRegDateDesc(member, pageRequest);
         List<Reply> result = pages.getContent();
 
-        List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
-        for (Reply reply : result) {
-            ReplyInfoResponseDTO replyInfoResponseDTO = ReplyInfoResponseDTO.builder()
+        List<ReplyInfoResponseDTO> responseList = result.stream().map(reply -> ReplyInfoResponseDTO.builder()
                     .bno(reply.getBoard().getBno())
                     .rno(reply.getRno())
                     .typeOfPost(TypeOfPost.reply.name())
@@ -198,9 +204,8 @@ public class BoardServiceImpl implements BoardService {
                     .contents(reply.getText())
                     .regDate(String.valueOf(reply.getRegDate()))
                     .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
-                    .build();
-            responseList.add(replyInfoResponseDTO);
-        }
+                    .build()
+                ).toList();
 
         return ResponseDTO.builder()
                 .message("작성한 댓글을 확인했습니다.")
@@ -325,5 +330,30 @@ public class BoardServiceImpl implements BoardService {
         if (!memberEmail.equals(userDetailsEmail)){
             throw new CustomException(ErrorCode.NOT_EQUALS_USER);
         }
+    }
+    private void insertNotification(Member sender, Board board) {
+        //최근 7일 이내에 접속한 팔로워들
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+
+        List<Follow> follows = followRepository.findRecentFollowers(sender.getEmail(), sevenDaysAgo);
+
+        List<Notification> notifications = follows.stream()
+                        .map(follow ->
+                                Notification.builder()
+                                .type(NoteEnum.longtime.name())
+                                .isRead(false)
+                                .createdAt(LocalDateTime.now())
+                                .board(board)
+                                .receiver(follow.getFromMember())
+                                .sender(sender)
+                                .build()
+                        ).toList();
+        notificationRepository.saveAll(notifications);
+
+        //SSE 연결된 유저에게만 실시간 전송
+        notifications.forEach(notification -> {
+            String email = notification.getReceiver().getEmail();
+                notificationService.sendNotification(email, "notification");
+        });
     }
 }

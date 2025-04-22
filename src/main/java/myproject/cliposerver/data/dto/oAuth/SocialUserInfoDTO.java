@@ -31,6 +31,7 @@ public class SocialUserInfoDTO {
                 .isValidate(true)
                 .isSocial(true)
                 .role(Role.USER)
+
                 .build();
     }
 }

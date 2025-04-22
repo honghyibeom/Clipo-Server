@@ -19,10 +19,10 @@ public class Notification {
     private Long nno;
     @ManyToOne
     @JoinColumn(name = "receiverMember")
-    private Member receiverMno;
+    private Member receiver;
     @ManyToOne
     @JoinColumn(name = "senderMember")
-    private Member senderMno;
+    private Member sender;
     @ManyToOne
     @JoinColumn(name = "board")
     private Board board;
@@ -35,5 +35,4 @@ public class Notification {
     LocalDateTime createdAt;
     @Column(nullable = false)
     private Boolean isRead;
-
 }

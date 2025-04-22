@@ -15,11 +15,13 @@ import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.MemberRepository;
 import myproject.cliposerver.service.mail.MailServiceImpl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -64,6 +66,7 @@ public class AuthService {
         String refreshToken = jwtTokenUtil.createRefreshToken();
 
         member.changeToken(accessToken, refreshToken);
+        member.changeLastLoginAt(LocalDateTime.now());
 
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
@@ -105,6 +108,12 @@ public class AuthService {
                 .message("토큰 재발급 완료")
                 .body(accessToken)
                 .build();
+    }
+
+    @Scheduled(cron = "0 0 3 * * ?") // 매일 새벽 3시에 실행
+    @Transactional
+    public void deleteNotValidUsers() {
+        memberRepository.deleteByIsValidate(false);
     }
 
     private Optional<Member> getUser(String email) {
