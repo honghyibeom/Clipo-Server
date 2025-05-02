@@ -71,11 +71,11 @@ public class Member extends BaseEntity {
     private List<ReplyLike> replyLikeList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "receiverMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> receiverList  = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "senderMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> senderList  = new ArrayList<>();
 
 
