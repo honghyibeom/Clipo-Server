@@ -19,7 +19,7 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tno;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String word;
 
     @Builder.Default
