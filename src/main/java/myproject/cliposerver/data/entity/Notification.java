@@ -35,4 +35,6 @@ public class Notification {
     LocalDateTime createdAt;
     @Column(nullable = false)
     private Boolean isRead;
+
+    public void changeRead(Boolean read) {this.isRead = read;}
 }

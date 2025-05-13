@@ -147,7 +147,7 @@ public class ReplyServiceImpl implements ReplyService {
         Board board = boardRepository.findByBno(bno)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_BOARD));
 
-        Page<Reply> pages = replyRepository.findByBoardAndParentIsNullOrderByRegDateDesc(board, pageRequest);
+        Page<Reply> pages = replyRepository.findByBoardAndParentIsNullOrderByRegDateAsc(board, pageRequest);
         List<Reply> result = pages.getContent();
 
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
@@ -166,7 +166,7 @@ public class ReplyServiceImpl implements ReplyService {
     public ResponseDTO getDetailChildReply(Long rno, int page, UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
 
-        Page<Reply> pages = replyRepository.findByParentRnoOrderByRegDateDesc(rno, pageRequest);
+        Page<Reply> pages = replyRepository.findByParentRnoOrderByRegDateAsc(rno, pageRequest);
         List<Reply> result = pages.getContent();
 
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();

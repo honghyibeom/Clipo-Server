@@ -17,6 +17,7 @@ public enum ErrorCode {
     EXIST_NICKNAME("같은 닉네임이 존재 합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_BOARD("존재하지 않는 게시글",HttpStatus.BAD_REQUEST),
     NOT_EXIST_REPLY("존재하지 않는 댓글",HttpStatus.BAD_REQUEST),
+    NOT_EXIST_NOTIFICATION("존재하지 않는 알림",HttpStatus.BAD_REQUEST),
     NOT_EXIST_FOLLOW("팔로우가 되어있지 않습니다.",HttpStatus.BAD_REQUEST),
     EMPTY_FILE_EXCEPTION("파일이 없습니다.",HttpStatus.BAD_REQUEST),
     IO_EXCEPTION_ON_IMAGE_UPLOAD("S3 이미지 업로드 에러.",HttpStatus.BAD_REQUEST),
@@ -34,6 +35,7 @@ public enum ErrorCode {
     EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_TAG("테그가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     WRONG_REQUEST("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+
 
 
     private final HttpStatus httpStatus;

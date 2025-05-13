@@ -6,9 +6,14 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
 import myproject.cliposerver.data.entity.Notification;
+import myproject.cliposerver.data.entity.Reply;
 import myproject.cliposerver.data.enumerate.NoteEnum;
+import myproject.cliposerver.exception.CustomException;
+import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.FollowRepository;
 import myproject.cliposerver.repository.NotificationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +34,11 @@ public class NotificationServiceImpl implements NotificationService {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @Override
-    public ResponseDTO getNotification(UserDetailsImpl userDetails) {
+    public ResponseDTO getNotification(UserDetailsImpl userDetails, int pages) {
         //알림 기록을 가져옴
-        List<Notification> result = notificationRepository.getNotificationsByReceiver(userDetails.getMember());
+        PageRequest pageRequest = PageRequest.of(pages, 7);
+        Page<Notification> pageResult = notificationRepository.getNotificationsByReceiver(userDetails.getMember(), pageRequest);
+        List<Notification> result = pageResult.getContent();
 
         List<NoteInfoResponseDTO> noteInfoResponseDTOList = result.stream().map(noti ->
                 NoteInfoResponseDTO.builder()
@@ -93,5 +100,30 @@ public class NotificationServiceImpl implements NotificationService {
                 emitters.remove(email);
             }
         }
+    }
+
+    @Override
+    public ResponseDTO getUnRead(UserDetailsImpl userDetails) {
+        Long unReadNumber = notificationRepository.countUnreadNotifications(userDetails.getMember());
+
+        return ResponseDTO.builder()
+                .message("isRead 하지않은 결과")
+                .body(unReadNumber)
+                .build();
+    }
+
+    @Override
+    public ResponseDTO updateUnRead(UserDetailsImpl userDetails, Long nno) {
+        Notification notification = notificationRepository.findByNno(nno)
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_NOTIFICATION));
+        notification.changeRead(true);
+        notificationRepository.save(notification);
+
+        Long unReadNumber = notificationRepository.countUnreadNotifications(userDetails.getMember());
+
+        return ResponseDTO.builder()
+                .message("해당 nno isRead 수정완료")
+                .body(unReadNumber)
+                .build();
     }
 }
