@@ -44,10 +44,11 @@ public class NotificationServiceImpl implements NotificationService {
                 NoteInfoResponseDTO.builder()
                         .type(noti.getType())
                         .bno(noti.getBoard() != null ? noti.getBoard().getBno() : null)
-                        .boardOneImage(noti.getBoard() != null
-                                    && noti.getBoard().getBoardImageList() != null
-                                    ? noti.getBoard().getBoardImageList().get(0).getSrc()
-                                    : null)
+                        .boardOneImage( noti.getBoard() != null &&
+                                noti.getBoard().getBoardImageList() != null &&
+                                !noti.getBoard().getBoardImageList().isEmpty()
+                                ? noti.getBoard().getBoardImageList().get(0).getSrc()
+                                : null)
                         .rno(noti.getReply() != null ? noti.getReply().getRno() : null)
                         .email(noti.getSender().getEmail())
                         .userProfileImage(noti.getSender().getProfileImage())
@@ -55,6 +56,7 @@ public class NotificationServiceImpl implements NotificationService {
                                 followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender())
                                 : null)
                         .createAt(LocalDateTime.now())
+                        .isRead(noti.getIsRead())
                         .build()).toList();
 
         return ResponseDTO.builder()

@@ -13,6 +13,7 @@ public class NoteInfoResponseDTO {
     private Long bno;
     private Long rno;
     private Boolean isFollowing;
+    private Boolean isRead;
     private LocalDateTime createAt;
     private String boardOneImage;
     private String userProfileImage;
