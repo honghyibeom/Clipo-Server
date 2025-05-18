@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.reply.PageResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyRequestDTO;
 import myproject.cliposerver.data.entity.Board;
@@ -156,9 +157,16 @@ public class ReplyServiceImpl implements ReplyService {
             responseList.add(replyInfoResponseDTO);
         }
 
+        PageResponseDTO<ReplyInfoResponseDTO> response = PageResponseDTO.<ReplyInfoResponseDTO>builder()
+                .data(responseList)
+                .page(pages.getNumber())
+                .hasNext(pages.hasNext())
+                .hasPrev(pages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("댓글을 확인했습니다.")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
@@ -189,9 +197,16 @@ public class ReplyServiceImpl implements ReplyService {
             responseList.add(replyInfoResponseDTO);
         }
 
+        PageResponseDTO<ReplyInfoResponseDTO> response = PageResponseDTO.<ReplyInfoResponseDTO>builder()
+                .data(responseList)
+                .page(pages.getNumber())
+                .hasNext(pages.hasNext())
+                .hasPrev(pages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("대댓글을 확인했습니다.")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
