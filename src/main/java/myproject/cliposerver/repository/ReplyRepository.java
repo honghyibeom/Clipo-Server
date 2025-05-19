@@ -35,7 +35,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
             "where r.board.bno = :bno " +
             "and r.parent is null " +
             "and r.regDate < :regDate ")
-    long countByReplyBefore(@Param("bno") Long bno, @Param("regDate") LocalDateTime targetDateTime);
+    long countByReplyBefore(@Param("bno") Long bno, @Param("regDate") LocalDateTime regDate);
 
     //해당 대댓글보다 regDate가 빠른 대댓의 개수 구하기
     @Query("SELECT COUNT(r)" +
