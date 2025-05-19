@@ -12,14 +12,20 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
+    //이메일으로 유저 정보 찾기
     Optional<Member> findByEmail(String email);
+    //리프레시 토큰으로 유저 정보 찾기
     Optional<Member> findByRefreshToken(String refreshToken);
+    //닉네임으로 유저 정보 찾기
     Optional<Member> findByName(String nickName);
+    //핸드폰으로 유저 정보 찾기
     Optional<Member> findByPhone(String phone);
 
+    // 검색으로 유저 정보 찾기
     @Query("select m from member m where m.name like :search ")
     Page<Member> findBySearch(@Param("search") String search, Pageable pageable);
 
+    // 인증이 안된 유저 제거
     void deleteByIsValidate(Boolean isValidate);
 
 }

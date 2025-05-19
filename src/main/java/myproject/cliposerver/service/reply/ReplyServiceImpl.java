@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.reply.PageNumberResponseDTO;
 import myproject.cliposerver.data.dto.reply.PageResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyRequestDTO;
@@ -220,6 +221,46 @@ public class ReplyServiceImpl implements ReplyService {
         return ResponseDTO.builder()
                 .body(replyInfoResponseDTO)
                 .message("댓글정보 단일 조회")
+                .build();
+    }
+
+    @Override
+    public ResponseDTO getPageReply(Long bno, Long rno, UserDetailsImpl userDetails) {
+        Reply reply = replyRepository.findByRno(rno)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_REPLY));
+
+        // 해당 댓글이 몇 번쨰인지 계산(작성시간 기준)
+        long index = replyRepository.countByReplyBefore(bno, reply.getRegDate());
+
+        int pageSize = 10;
+        long pageNumber = index / pageSize;
+        PageNumberResponseDTO response = PageNumberResponseDTO.builder()
+                .pageNumber(pageNumber)
+                .build();
+
+        return ResponseDTO.builder()
+                .message("댓글 pageNumber 결과")
+                .body(response)
+                .build();
+    }
+
+    @Override
+    public ResponseDTO getPageNestReply(Long rno, Long nestRno, UserDetailsImpl userDetails) {
+        Reply nestReply = replyRepository.findByRno(nestRno)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_REPLY));
+
+        // 해당 댓글이 몇 번쨰인지 계산(작성시간 기준)
+        long index = replyRepository.countNestedRepliesBefore(rno, nestReply.getRegDate());
+
+        int pageSize = 10;
+        long pageNumber = index / pageSize;
+        PageNumberResponseDTO response = PageNumberResponseDTO.builder()
+                .pageNumber(pageNumber)
+                .build();
+
+        return ResponseDTO.builder()
+                .message("댓글 pageNumber 결과")
+                .body(response)
                 .build();
     }
 

@@ -10,7 +10,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TagMapRepository extends JpaRepository<TagMap, Long> {
-
+    // 태그맵 찾기
     Page<TagMap> findByTag(Tag tag, Pageable pageable);
+    //  태그맵 제거
     void deleteByBoard(Board board);
 }

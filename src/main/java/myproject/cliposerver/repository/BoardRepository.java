@@ -16,8 +16,10 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
     // 게시글 조회
     Optional<Board> findByBno(Long bno);
-    // 게시글
+    // 특정 유저의 게시글
     Page<Board> findByMemberOrderByRegDateDesc(Member member, Pageable pageable);
+    // 좋아요한 게시글
     Page<Board> findByBoardLikeListMemberOrderByRegDateDesc(Member member, Pageable pageable);
+    // 모든 게시글
     Page<Board> findAllByOrderByRegDateDesc(Pageable pageable);
 }

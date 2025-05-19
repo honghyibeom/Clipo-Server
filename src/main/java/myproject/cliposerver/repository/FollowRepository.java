@@ -16,19 +16,15 @@ import java.util.Optional;
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Long> {
     Optional<Follow> findByFromMemberAndToMember(Member fromMember, Member toMember);
-
     //팔로잉 수
     Long countByFromMember(Member fromMember);
-
     //팔로워 수
     Long countByToMember(Member toMember);
-
     //팔로워 조회
     Page<Follow> findByToMember(Member toMember, Pageable pageable);
-
     //팔로잉 조회
     Page<Follow> findByFromMember(Member fromMember,Pageable pageable);
-
+    //팔로잉 여부
     Boolean existsByFromMemberAndToMember(Member fromMember, Member toMember);
 
     // 최근 7일 이내에 접속한 팔로워들

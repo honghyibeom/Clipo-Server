@@ -20,6 +20,10 @@ public interface ReplyService {
     ResponseDTO getDetailChildReply(Long rno, int page, UserDetailsImpl userDetails);
     // 댓글 하나 조회
     ResponseDTO getDetailOneReply(Long rno, UserDetailsImpl userDetails);
+    // 댓글 페이징번호
+    ResponseDTO getPageReply(Long bno,Long rno, UserDetailsImpl userDetails);
+    // 대댓글 페이징번호
+    ResponseDTO getPageNestReply(Long rno,Long nestRno, UserDetailsImpl userDetails);
 
 
 }

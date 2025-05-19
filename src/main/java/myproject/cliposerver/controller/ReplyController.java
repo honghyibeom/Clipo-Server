@@ -62,4 +62,21 @@ public class ReplyController {
                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(replyService.getDetailOneReply(rno, userDetails));
     }
+
+    @Operation(summary = "댓글 페이지 번호 조회", description = "특정 댓글의 페이징 정보를 조회하는 API.")
+    @GetMapping("/get/pageNumber/")
+    public ResponseEntity<ResponseDTO> getPageNumberReply(@RequestParam("bno") Long bno,
+                                                          @RequestParam("rno") Long rno,
+                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(replyService.getPageReply(bno, rno, userDetails));
+    }
+
+    @Operation(summary = "대댓글 페이지 번호 조회", description = "특정 대댓글의 페이징 정보를 조회하는 API.")
+    @GetMapping("/get/pageNumber/")
+    public ResponseEntity<ResponseDTO> getPageNumberNestReply(@RequestParam("parentId") Long rno,
+                                                              @RequestParam("targetId") Long nestRno,
+                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(replyService.getPageNestReply(rno, nestRno, userDetails));
+    }
+
 }
