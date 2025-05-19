@@ -72,7 +72,7 @@ public class ReplyController {
     }
 
     @Operation(summary = "대댓글 페이지 번호 조회", description = "특정 대댓글의 페이징 정보를 조회하는 API.")
-    @GetMapping("/get/pageNumber/")
+    @GetMapping("/get/pageNumber/nest/")
     public ResponseEntity<ResponseDTO> getPageNumberNestReply(@RequestParam("parentId") Long rno,
                                                               @RequestParam("targetId") Long nestRno,
                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
