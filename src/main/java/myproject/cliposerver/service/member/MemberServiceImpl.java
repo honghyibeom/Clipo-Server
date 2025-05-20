@@ -9,7 +9,6 @@ import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
 import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
-import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

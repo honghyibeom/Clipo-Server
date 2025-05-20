@@ -6,7 +6,6 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
-import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.*;
 import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
