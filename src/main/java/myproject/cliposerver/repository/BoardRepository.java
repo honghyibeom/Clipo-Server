@@ -19,4 +19,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findByBoardLikeListMemberOrderByRegDateDesc(Member member, Pageable pageable);
     // 모든 게시글
     Page<Board> findAllByOrderByRegDateDesc(Pageable pageable);
+
 }

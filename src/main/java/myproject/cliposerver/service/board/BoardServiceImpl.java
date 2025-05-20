@@ -3,6 +3,7 @@ package myproject.cliposerver.service.board;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
@@ -176,9 +177,17 @@ public class BoardServiceImpl implements BoardService {
             BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(pages.getNumber())
+                .hasNext(pages.hasNext())
+                .hasPrev(pages.hasPrevious())
+                .build();
+
+
         return ResponseDTO.builder()
                 .message("포스트 확인했습니다.")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
@@ -207,9 +216,16 @@ public class BoardServiceImpl implements BoardService {
                     .build()
                 ).toList();
 
+        PageResponseDTO<ReplyInfoResponseDTO> response = PageResponseDTO.<ReplyInfoResponseDTO>builder()
+                .data(responseList)
+                .page(pages.getNumber())
+                .hasNext(pages.hasNext())
+                .hasPrev(pages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("작성한 댓글을 확인했습니다.")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
@@ -245,10 +261,16 @@ public class BoardServiceImpl implements BoardService {
             BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(boardPages.getNumber())
+                .hasNext(boardPages.hasNext())
+                .hasPrev(boardPages.hasPrevious())
+                .build();
 
         return ResponseDTO.builder()
                 .message("메인페이지 조회")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
@@ -275,9 +297,17 @@ public class BoardServiceImpl implements BoardService {
             BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(tagMap.getBoard(), userDetails);
             responseList.add(boardInfoResponseDTO);
         }
+
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(tagMapPages.getNumber())
+                .hasNext(tagMapPages.hasNext())
+                .hasPrev(tagMapPages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("테그로 게시글 검색결과")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 

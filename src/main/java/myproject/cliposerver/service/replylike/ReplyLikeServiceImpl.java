@@ -3,7 +3,9 @@ package myproject.cliposerver.service.replylike;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.entity.Notification;
@@ -85,9 +87,16 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
             responseDTOS.add(littleUserInfoResponseDTO);
         }
 
+        PageResponseDTO<LittleUserInfoResponseDTO> response = PageResponseDTO.<LittleUserInfoResponseDTO>builder()
+                .data(responseDTOS)
+                .page(replyLikePage.getNumber())
+                .hasNext(replyLikePage.hasNext())
+                .hasPrev(replyLikePage.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
-                .message("boardLike 유저들 목록 확인")
-                .body(responseDTOS)
+                .message("replyLike 유저들 목록 확인")
+                .body(response)
                 .build();
     }
     private void insertNotification(Member sender, Reply reply) {

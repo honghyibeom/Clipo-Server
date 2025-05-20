@@ -1,4 +1,4 @@
-package myproject.cliposerver.data.dto.reply;
+package myproject.cliposerver.data.dto;
 
 import lombok.Builder;
 import lombok.Getter;

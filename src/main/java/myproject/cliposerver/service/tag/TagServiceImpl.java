@@ -3,9 +3,8 @@ package myproject.cliposerver.service.tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
-import myproject.cliposerver.data.dto.tag.SearchTagResponseDTO;
-import myproject.cliposerver.data.entity.Tag;
 import myproject.cliposerver.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,12 +37,20 @@ public class TagServiceImpl implements TagService {
         }
         //프론트맨이 지금까지 모든 파싱과정을 body하고 바로 배열로 하는걸로해버려서
         //이걸 한번에 못고치겠다고 하여 tags를 없애고 배열만 전달해야댐..
+//
 //        SearchTagResponseDTO searchTagResponseDTO = SearchTagResponseDTO.builder()
-//                .tags(tags)
-//                .build();
+//                        .tags(tags)
+//                        .build();
+
+        PageResponseDTO<String> response = PageResponseDTO.<String>builder()
+                .data(List.of(tags))
+                .page(tagPages.getNumber())
+                .hasNext(tagPages.hasNext())
+                .hasPrev(tagPages.hasPrevious())
+                .build();
 
         return ResponseDTO.builder()
-                .body(tags)
+                .body(response)
                 .message("테그 검색 결과")
                 .build();
     }

@@ -3,7 +3,9 @@ package myproject.cliposerver.service.notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
 import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
 import myproject.cliposerver.data.entity.Notification;
 import myproject.cliposerver.data.entity.Reply;
@@ -59,9 +61,16 @@ public class NotificationServiceImpl implements NotificationService {
                         .isRead(noti.getIsRead())
                         .build()).toList();
 
+        PageResponseDTO<NoteInfoResponseDTO> response = PageResponseDTO.<NoteInfoResponseDTO>builder()
+                .data(noteInfoResponseDTOList)
+                .page(pageResult.getNumber())
+                .hasNext(pageResult.hasNext())
+                .hasPrev(pageResult.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("활동기록 조회")
-                .body(noteInfoResponseDTOList)
+                .body(response)
                 .build();
     }
 

@@ -3,11 +3,13 @@ package myproject.cliposerver.service.member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.UpdatePasswordRequestDTO;
 import myproject.cliposerver.data.dto.member.UpdateUserInfoRequestDTO;
 import myproject.cliposerver.data.dto.member.UserInfoDetailsResponseDTO;
 import myproject.cliposerver.data.dto.member.UserInfoResponseDTO;
+import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.exception.CustomException;
@@ -191,8 +193,15 @@ public class MemberServiceImpl implements MemberService {
             responseList.add(userInfoResponseDTO);
         }
 
+        PageResponseDTO<UserInfoResponseDTO> response = PageResponseDTO.<UserInfoResponseDTO>builder()
+                .data(responseList)
+                .page(memberPages.getNumber())
+                .hasNext(memberPages.hasNext())
+                .hasPrev(memberPages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
-                .body(responseList)
+                .body(response)
                 .message("유저 검색 결과")
                 .build();
     }

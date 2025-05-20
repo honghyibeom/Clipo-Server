@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.reply.PageNumberResponseDTO;
-import myproject.cliposerver.data.dto.reply.PageResponseDTO;
+import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyRequestDTO;
 import myproject.cliposerver.data.entity.Board;
