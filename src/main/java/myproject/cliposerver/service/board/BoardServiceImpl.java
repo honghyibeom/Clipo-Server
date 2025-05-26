@@ -56,9 +56,9 @@ public class BoardServiceImpl implements BoardService {
             board.changeBoardImageList(boardImageList);
         }
         //tag 생성
-        if (boardRequestDTO.getTag() != null) {
+        if (boardRequestDTO.getTags() != null) {
             List<Tag> boardTagList = new ArrayList<>();
-            for (String tag : boardRequestDTO.getTag()) {
+            for (String tag : boardRequestDTO.getTags()) {
                 boardTagList.add(boardRequestDTO.toEntity(tag));
             }
 
@@ -118,7 +118,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         // 태그 삭제 후 추가
-        if (boardRequestDTO.getTag() != null) {
+        if (boardRequestDTO.getTags() != null) {
             List<TagMap> tagMaps = processTags(boardRequestDTO, board);
             board.changeTagMapList(tagMaps);
         }
@@ -333,7 +333,7 @@ public class BoardServiceImpl implements BoardService {
                 .numberOfLike(boardLikeRepository.countByBoard(board))
                 .numberOfComments(replyRepository.countByBoard(board))
                 .contents(board.getContent())
-                .tag(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
+                .tags(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
                 .regDate(String.valueOf(board.getRegDate()))
                 .boardImages(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
                 .isLike(boardLikeRepository.existsByBoardAndMember(board, userDetails.getMember()))
@@ -346,7 +346,7 @@ public class BoardServiceImpl implements BoardService {
     private List<TagMap> processTags(BoardRequestDTO boardRequestDTO, Board board) {
         tagMapRepository.deleteByBoard(board);
 
-        List<Tag> tags = boardRequestDTO.getTag().stream()
+        List<Tag> tags = boardRequestDTO.getTags().stream()
                 .map(boardRequestDTO::toEntity)
                 .toList();
         tagRepository.saveAll(tags);
