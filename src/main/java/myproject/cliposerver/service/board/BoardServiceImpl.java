@@ -97,8 +97,8 @@ public class BoardServiceImpl implements BoardService {
 
         // 삭제 대상 이미지 추출
         List<BoardImage> deleteImages = board.getBoardImageList().stream()
-                .filter(image -> !originImage.contains(image.getSrc())) // 유지되지 않는 이미지를 필터링
-                .toList();
+                .filter(image -> !originImage.contains(image.getSrc()))
+                .toList();// 유지되지 않는 이미지를 필터링
 
         // 삭제 대상 이미지 처리
         if (!deleteImages.isEmpty()) {
