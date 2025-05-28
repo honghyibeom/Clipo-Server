@@ -32,7 +32,7 @@ public class TagServiceImpl implements TagService {
     public ResponseDTO getTagForSearch(int page, UserDetailsImpl userDetails, String search) {
         //테그를 가져오자
         PageRequest pageRequest = PageRequest.of(page, 6);
-        Page<String> tagPages = tagRepository.findDistinctWords(search + "%",pageRequest);
+        Page<String> tagPages = tagRepository.findWords(search + "%",pageRequest);
 
         if (tagPages.isEmpty()) {
             return ResponseDTO.builder()

@@ -18,6 +18,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     //테그들 찾기
     List<Tag> findAllByWordIn(List<String> words);
     // 검색한 태그들
-    @Query("select distinct t.word from tag t where t.word like :search")
-    Page<String> findDistinctWords(@Param("search") String search, Pageable pageable);
+    @Query("select t.word from tag t where t.word like :search")
+    Page<String> findWords(@Param("search") String search, Pageable pageable);
 }
