@@ -15,7 +15,7 @@ public class BoardRequestDTO {
     @Schema(description = "게시글 내용", example = "1")
     private String content;
     @Schema(description = "테그", example = "#테그")
-    private List<String> tag;
+    private List<String> tags;
     @Schema(description = "이미지(업데이트시 입력)", example = "imageUrl")
     private List<String> originImages;
     @Schema(description = "좋아요 허용 여부", example = "true")
@@ -36,18 +36,6 @@ public class BoardRequestDTO {
         return BoardImage.builder()
                 .board(board)
                 .src(src)
-                .build();
-    }
-    public Tag toEntity(String word){
-        return Tag.builder()
-                .word(word)
-                .build();
-    }
-
-    public TagMap toEntity(Board board, Tag tag){
-        return TagMap.builder()
-                .board(board)
-                .tag(tag)
                 .build();
     }
 }

@@ -17,6 +17,7 @@ import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.*;
 import myproject.cliposerver.service.Image.S3ImageService;
 import myproject.cliposerver.service.notification.NotificationService;
+import myproject.cliposerver.service.tag.TagService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class BoardServiceImpl implements BoardService {
     private final S3ImageService imageService;
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
+    private final TagService tagService;
 
     @Transactional
     public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages , UserDetailsImpl userDetails){
@@ -55,21 +57,11 @@ public class BoardServiceImpl implements BoardService {
             }
             board.changeBoardImageList(boardImageList);
         }
-        //tag 생성
-        if (boardRequestDTO.getTag() != null) {
-            List<Tag> boardTagList = new ArrayList<>();
-            for (String tag : boardRequestDTO.getTag()) {
-                boardTagList.add(boardRequestDTO.toEntity(tag));
-            }
 
-            tagRepository.saveAll(boardTagList);
-            //tagMap 생성
-            List<TagMap> tagMapList = new ArrayList<>();
-            for (Tag tag : boardTagList) {
-                tagMapList.add(boardRequestDTO.toEntity(board, tag));
-            }
-            board.changeTagMapList(tagMapList);
-        }
+        //태그 생성
+        List<TagMap> tagMaps = tagService.createTagMaps(boardRequestDTO.getTags(), board);
+        board.changeTagMapList(tagMaps);
+
         boardRepository.save(board);
 
         //알림기록 생성
@@ -118,8 +110,8 @@ public class BoardServiceImpl implements BoardService {
         }
 
         // 태그 삭제 후 추가
-        if (boardRequestDTO.getTag() != null) {
-            List<TagMap> tagMaps = processTags(boardRequestDTO, board);
+        if (boardRequestDTO.getTags() != null) {
+            List<TagMap> tagMaps = tagService.updateTagMaps(boardRequestDTO.getTags(), board);
             board.changeTagMapList(tagMaps);
         }
 
@@ -151,11 +143,14 @@ public class BoardServiceImpl implements BoardService {
 
         identification(board.getMember().getEmail(), userDetails.getEmail());
 
+        // 이미지 삭제
         if (board.getBoardImageList() != null) {
             for (String fileName : board.getBoardImageList().stream().map(BoardImage::getSrc).toList()) {
                 imageService.deleteFile(fileName);
             }
         }
+        // 태그맵 삭제 및 고아태그 삭제
+        tagService.deleteTagMaps(board);
 
         boardRepository.delete(board);
         return ResponseDTO.builder()
@@ -333,7 +328,7 @@ public class BoardServiceImpl implements BoardService {
                 .numberOfLike(boardLikeRepository.countByBoard(board))
                 .numberOfComments(replyRepository.countByBoard(board))
                 .contents(board.getContent())
-                .tag(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
+                .tags(board.getTagMapList().stream().map(tagMap -> tagMap.getTag().getWord()).toList())
                 .regDate(String.valueOf(board.getRegDate()))
                 .boardImages(board.getBoardImageList().stream().map(BoardImage::getSrc).toList())
                 .isLike(boardLikeRepository.existsByBoardAndMember(board, userDetails.getMember()))
@@ -341,19 +336,6 @@ public class BoardServiceImpl implements BoardService {
                 .isReplyAllowed(board.getIsReplyAllowed())
                 .isLikeVisible(board.getIsLikeVisible())
                 .build();
-    }
-
-    private List<TagMap> processTags(BoardRequestDTO boardRequestDTO, Board board) {
-        tagMapRepository.deleteByBoard(board);
-
-        List<Tag> tags = boardRequestDTO.getTag().stream()
-                .map(boardRequestDTO::toEntity)
-                .toList();
-        tagRepository.saveAll(tags);
-
-        return tags.stream()
-                .map(tag -> boardRequestDTO.toEntity(board, tag))
-                .toList();
     }
 
     private void identification(String memberEmail, String userDetailsEmail) {

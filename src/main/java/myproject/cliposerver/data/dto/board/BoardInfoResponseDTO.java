@@ -3,7 +3,6 @@ package myproject.cliposerver.data.dto.board;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -18,7 +17,7 @@ public class BoardInfoResponseDTO {
     private Long numberOfLike;
     private Long numberOfComments;
     private String contents;
-    private List<String> tag;
+    private List<String> tags;
     private String regDate;
     private Boolean isLike;
     private Boolean isFollowing;

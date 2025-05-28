@@ -3,8 +3,6 @@ package myproject.cliposerver.data.dto.reply;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
-
 @Builder
 @Getter
 public class ReplyInfoResponseDTO {
@@ -15,7 +13,6 @@ public class ReplyInfoResponseDTO {
     private String email;
     private String nickName;
     private String profilePicture;
-    private List<String> boardImage;
     private String commentImage;
     private Long numberOfLike;
     private Long numberOfComments;
