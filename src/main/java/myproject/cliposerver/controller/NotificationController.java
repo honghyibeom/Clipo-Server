@@ -1,6 +1,7 @@
 package myproject.cliposerver.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
@@ -23,9 +24,9 @@ public class NotificationController {
                                                        @PathVariable int pages) {
         return ResponseEntity.ok(notificationService.getNotification(userDetails, pages));
     }
-    @GetMapping(value = "/subscribe")
-    public SseEmitter ringNotification(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return notificationService.subscribe(userDetails);
+    @GetMapping(value = "/subscribe/{email}")
+    public SseEmitter ringNotification(@PathVariable String email) {
+        return notificationService.subscribe(email);
     }
 
     @Operation(summary = "최초 isRead 배열",description = "로그인시 읽지 않은 알림의 갯수 전달")

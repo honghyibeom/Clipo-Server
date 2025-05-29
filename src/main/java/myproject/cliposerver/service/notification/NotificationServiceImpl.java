@@ -79,12 +79,12 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.deleteByCreatedAtBefore(threshold);
     }
 
-    public SseEmitter subscribe(UserDetailsImpl userDetails) {
+    public SseEmitter subscribe(String email) {
         SseEmitter emitter = new SseEmitter(60 * 1000L); // 1분 유지
-        emitters.put(userDetails.getEmail(), emitter);
+        emitters.put(email, emitter);
 
-        emitter.onCompletion(() -> emitters.remove(userDetails.getEmail()));
-        emitter.onTimeout(() -> emitters.remove(userDetails.getEmail()));
+        emitter.onCompletion(() -> emitters.remove(email));
+        emitter.onTimeout(() -> emitters.remove(email));
 
         // 연결 확인을 위한 더미 데이터
         try {
