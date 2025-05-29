@@ -15,10 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,20 +38,8 @@ public class TagServiceImpl implements TagService {
         }
         List<String> result = tagPages.getContent();
 
-        // 객체 리스트를 String[]로 만드는 작업
-        String[] tags = new String[result.size()];
-        for (int i = 0; i < result.size(); i++) {
-            tags[i] = result.get(i);
-        }
-        //프론트맨이 지금까지 모든 파싱과정을 body하고 바로 배열로 하는걸로해버려서
-        //이걸 한번에 못고치겠다고 하여 tags를 없애고 배열만 전달해야댐..
-//
-//        SearchTagResponseDTO searchTagResponseDTO = SearchTagResponseDTO.builder()
-//                        .tags(tags)
-//                        .build();
-
         PageResponseDTO<String> response = PageResponseDTO.<String>builder()
-                .data(List.of(tags))
+                .data(result)
                 .page(tagPages.getNumber())
                 .hasNext(tagPages.hasNext())
                 .hasPrev(tagPages.hasPrevious())
