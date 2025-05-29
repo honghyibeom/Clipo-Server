@@ -171,14 +171,12 @@ public class MemberServiceImpl implements MemberService {
     public ResponseDTO getUserForSearch(int page, UserDetailsImpl userDetails, String search) {
         //유저 가져오기
         PageRequest pageRequest = PageRequest.of(page, 6);
-        Page<Member> memberPages = memberRepository.findBySearch(search + "%", pageRequest);
+        String getLike = "%";
+        if (search.isEmpty()) {
+            getLike = "";
+        }
+        Page<Member> memberPages = memberRepository.findBySearch(search + getLike, pageRequest);
 
-//        if (memberPages.isEmpty()) {
-//            return ResponseDTO.builder()
-//                    .message("유저가 없습니다.")
-//                    .body(Collections.emptyList()) // 무한 스크롤할 때 array의 갯수로 판단을 한다해서 빈 배열을 보냄
-//                    .build();
-//        }
         List<Member> result = memberPages.getContent();
 
         List<UserInfoResponseDTO> responseList = new ArrayList<>();
