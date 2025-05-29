@@ -11,7 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Tag(name = "NotificationAPI", description = "알림 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/notification/activity")

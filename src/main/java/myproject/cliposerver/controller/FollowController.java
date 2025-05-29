@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "FollowAPI", description = "팔로우 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/follow")

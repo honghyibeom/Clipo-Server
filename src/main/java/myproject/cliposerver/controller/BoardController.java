@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Tag(name = "BoardAPI", description = "게시글 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/board")

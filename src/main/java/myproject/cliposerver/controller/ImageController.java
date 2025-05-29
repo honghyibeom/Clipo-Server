@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Tag(name = "ImageAPI", description = "이미지 업로드용 API")
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

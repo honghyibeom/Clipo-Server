@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "TagAPI", description = "tag 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/tag")
