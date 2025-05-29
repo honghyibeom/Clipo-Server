@@ -30,12 +30,6 @@ public class TagServiceImpl implements TagService {
         //테그를 가져오자
         PageRequest pageRequest = PageRequest.of(page, 6);
         Page<String> tagPages = tagRepository.findWords(search + "%",pageRequest);
-
-        if (tagPages.isEmpty()) {
-            return ResponseDTO.builder()
-                    .message("테그가 없습니다.")
-                    .build();
-        }
         List<String> result = tagPages.getContent();
 
         PageResponseDTO<String> response = PageResponseDTO.<String>builder()
