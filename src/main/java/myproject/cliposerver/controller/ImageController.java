@@ -1,6 +1,7 @@
 package myproject.cliposerver.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Tag(name = "ImageAPI", description = "이미지 업로드용 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

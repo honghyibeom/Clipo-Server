@@ -2,6 +2,7 @@ package myproject.cliposerver.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+@Tag(name = "AuthAPI", description = "유저 로그인 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
