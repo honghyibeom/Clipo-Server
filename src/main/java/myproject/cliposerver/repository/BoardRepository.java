@@ -4,6 +4,7 @@ import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 좋아요한 게시글
     Page<Board> findByBoardLikeListMemberOrderByRegDateDesc(Member member, Pageable pageable);
     // 모든 게시글
+    //@EntityGraph(attributePaths = {"member", "boardImageList", "tagMapList.tag"})
     Page<Board> findAllByOrderByRegDateDesc(Pageable pageable);
 
 }
