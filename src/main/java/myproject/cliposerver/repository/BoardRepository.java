@@ -1,13 +1,16 @@
 package myproject.cliposerver.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,5 +24,11 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 모든 게시글
     //@EntityGraph(attributePaths = {"member", "boardImageList", "tagMapList.tag"})
     Page<Board> findAllByOrderByRegDateDesc(Pageable pageable);
+    // 팔로잉한 게시글만 나오도록
+    @Query("SELECT b " +
+            "FROM board b " +
+            "WHERE b.member IN (select f.toMember from follow f where f.fromMember = :me )" +
+            "ORDER BY b.regDate DESC ")
+    Page<Board> findAllByFollowing(@Param("me") Member me, Pageable pageable);
 
 }

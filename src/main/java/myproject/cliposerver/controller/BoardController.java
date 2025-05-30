@@ -85,4 +85,11 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoardForTag(page, userDetails, search));
     }
 
+    @Operation(summary = "팔로잉 기반 게시글", description = "팔로잉한 게시글만 나오도록 함")
+    @GetMapping("/get/postInfo/follow/{page}/")
+    public ResponseEntity<ResponseDTO> getBoardForFollowing(@PathVariable("page") int page,
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(boardService.getFollowingBoard(page, userDetails));
+    }
+
 }

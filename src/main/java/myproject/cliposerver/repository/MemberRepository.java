@@ -20,7 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByName(String nickName);
     //핸드폰으로 유저 정보 찾기
     Optional<Member> findByPhone(String phone);
-
+    // 유저가 맞는지 확인
+    boolean existsByEmail(String email);
     // 검색으로 유저 정보 찾기
     @Query("select m from member m where m.name like :search ")
     Page<Member> findBySearch(@Param("search") String search, Pageable pageable);

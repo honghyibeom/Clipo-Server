@@ -318,6 +318,30 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
+    @Override
+    public ResponseDTO getFollowingBoard(int page, UserDetailsImpl userDetails) {
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        Page<Board> boardPages = boardRepository.findAllByFollowing(userDetails.getMember(), pageRequest);
+
+        List<Board> result = boardPages.getContent();
+        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+        for (Board board : result) {
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
+            responseList.add(boardInfoResponseDTO);
+        }
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(boardPages.getNumber())
+                .hasNext(boardPages.hasNext())
+                .hasPrev(boardPages.hasPrevious())
+                .build();
+
+        return ResponseDTO.builder()
+                .body(response)
+                .message("팔로잉 유저 게시글 검색결과")
+                .build();
+    }
+
     private BoardInfoResponseDTO getBoardInfoResponseDTO(Board board, UserDetailsImpl userDetails) {
 
         return BoardInfoResponseDTO.builder()

@@ -11,6 +11,7 @@ import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.FollowRepository;
+import myproject.cliposerver.repository.MemberRepository;
 import myproject.cliposerver.repository.NotificationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final FollowRepository followRepository;
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final MemberRepository memberRepository;
 
     @Override
     public ResponseDTO getNotification(UserDetailsImpl userDetails, int pages) {
@@ -80,6 +82,10 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public SseEmitter subscribe(String email) {
+
+        if(!memberRepository.existsByEmail(email)) {
+            throw new CustomException(ErrorCode.NOT_EQUALS_USER);
+        }
         SseEmitter emitter = new SseEmitter(60 * 1000L); // 1분 유지
         emitters.put(email, emitter);
 

@@ -28,6 +28,8 @@ public interface BoardService {
     ResponseDTO getDetailBoard(Long bno,UserDetailsImpl userDetails);
     // 테그로 게시글 검색(자동완성 x)
     ResponseDTO getBoardForTag(int page,UserDetailsImpl userDetails, String tag);
+    // 팔로잉한 게시글만 나오도록
+    ResponseDTO getFollowingBoard(int page,UserDetailsImpl userDetails);
 
 
 }
