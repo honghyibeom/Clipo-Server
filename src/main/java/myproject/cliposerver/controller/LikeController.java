@@ -44,7 +44,7 @@ public class LikeController {
     }
 
     @Operation(summary = "좋아요 유저들 조회",description = "게시글 좋아요 누른 유저들 조회 api")
-    @GetMapping("/api/boardLike/get/users/{page}/")
+    @GetMapping("/api/boardLike/get/users/{page}")
     public ResponseEntity<ResponseDTO> getBoardLikeList(@RequestParam("bno") Long bno,
                                                         @PathVariable("page") int page,
                                                         @AuthenticationPrincipal UserDetailsImpl userDetails){
