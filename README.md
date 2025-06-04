@@ -61,4 +61,4 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ## 📌 ERD
 ![image](https://github.com/user-attachments/assets/a4ddeeb3-3028-4219-ae3e-af1c30c2d67a)
 
-
+## 📌 View
