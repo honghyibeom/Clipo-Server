@@ -59,6 +59,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - 알림 기록 조회
 
 ## 📌 ERD
-![image](https://github.com/user-attachments/assets/a4ddeeb3-3028-4219-ae3e-af1c30c2d67a)
+![image](https://github.com/user-attachments/assets/9638913c-a4d9-4e54-966b-768d86739b18)
+
 
 ## 📌 View
