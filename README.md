@@ -16,8 +16,8 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 
 ### ⚙️ 개발 환경
 - `Java 17`
-- `JDK 1.8.0`
-- **IDE** : STS 3.9
+- `JDK 17.0.14`
+- **IDE** : Intelij
 - **Framework** : Springboot(3.3.1)
 - **Database** : Maria DB(11xe)
 - **ORM** : JPA
