@@ -53,6 +53,7 @@ public class NotificationServiceImpl implements NotificationService {
                                 : null)
                         .rno(noti.getReply() != null ? noti.getReply().getRno() : null)
                         .email(noti.getSender().getEmail())
+                        .nickName(noti.getSender().getName())
                         .userProfileImage(noti.getSender().getProfileImage())
                         .isFollowing(noti.getType().equals(NoteEnum.follow.getType()) ?
                                 followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender())
