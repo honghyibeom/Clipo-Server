@@ -37,3 +37,6 @@ out/
 ### VS Code ###
 .vscode/
 
+# .gitignore 에 추가
+application.properties
+application-*.properties
