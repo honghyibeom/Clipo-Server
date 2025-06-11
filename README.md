@@ -23,11 +23,11 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - **ORM** : JPA
 
 ## 📌 사용 기술
-- spring security
-- s3
+- Spring Security
+- S3
 - Swagger
-- Redis , sms
-- sse
+- Redis , Sms
+- Sse
 
 ## 📌 주요 기능
 #### 로그인
