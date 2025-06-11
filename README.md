@@ -22,6 +22,12 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - **Database** : Maria DB(11xe)
 - **ORM** : JPA
 
+### 📌 사용 기술
+- Spring Security
+- S3
+- Swagger
+- Redis , Sms
+- Sse
 ## 📌 주요 기능
 #### 로그인
 - jwt 방식 로그인
