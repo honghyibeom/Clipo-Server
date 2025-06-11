@@ -32,6 +32,7 @@ public enum ErrorCode {
     UNSUPPORTED_TOKEN("지원하지 않는 토큰", HttpStatus.FORBIDDEN),
     MALFORMED_TOKEN("형식 오류 등 일반적인 잘못된 토큰", HttpStatus.FORBIDDEN),
     S3_CHECK_FILE_EXISTENCE_EXCEPTION("S3_CHECK_FILE_EXISTENCE_EXCEPTION", HttpStatus.BAD_REQUEST),
+    S3_DELETE_EXCEPTION("S3 이미지 삭제 실패...", HttpStatus.BAD_REQUEST),
     EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_TAG("테그가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
     WRONG_REQUEST("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
