@@ -1,6 +1,6 @@
 # SpringBoot-Project-SNS
 - springBoot + React <br>
-SNS 웹 + 모바일 프로젝트 입니다. <br>
+이 프로젝트는 SNS 웹 + 모바일 프로젝트 입니다. <br>
 
 ## 🖥️ 프로젝트 소개
 Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
@@ -21,6 +21,13 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - **Framework** : Springboot(3.3.1)
 - **Database** : Maria DB(11xe)
 - **ORM** : JPA
+
+## 📌 사용 기술
+- spring security
+- s3
+- Swagger
+- Redis , sms
+- sse
 
 ## 📌 주요 기능
 #### 로그인
@@ -55,7 +62,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 #### 알림 기능
 - 팔로우 알림
 - 좋아요 알림
-- 팔로잉 계정의 게시글을 오랜만에 올렸을때
+- 팔로잉 계정의 유저가 게시글을 오랜만에 올렸을때
 - 알림 기록 조회
 
 ## 🗒 ERD
