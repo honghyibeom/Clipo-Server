@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class NoteInfoResponseDTO {
     private String type;
     private String email;
-    private String nickName;
+    private String from;
     private Long bno;
     private Long rno;
     private Boolean isFollowing;
