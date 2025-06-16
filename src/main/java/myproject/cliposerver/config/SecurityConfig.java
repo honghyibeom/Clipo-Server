@@ -8,6 +8,7 @@ import myproject.cliposerver.config.jwt.JwtTokenUtil;
 import myproject.cliposerver.config.security.CorsConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,7 +38,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    @Profile("local")
+    public SecurityFilterChain localFilterChain(HttpSecurity http) throws Exception{
         //form 로그인 방식 비활성화
         http.formLogin(AbstractHttpConfigurer::disable);
 
@@ -62,6 +64,42 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/h2-console/**"),
                                 new AntPathRequestMatcher("/swagger-ui/**"),
                                 new AntPathRequestMatcher("/api-docs/**"),
+                                new AntPathRequestMatcher("/api/notification/activity/subscribe/**")
+                        ).permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(new JwtFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandlingConfigurer ->
+                        exceptionHandlingConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                .accessDeniedHandler(jwtAccessDeniedHandler))
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+        return http.build();
+    }
+
+    @Bean
+    @Profile("!local")
+    public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception{
+        //form 로그인 방식 비활성화
+        http.formLogin(AbstractHttpConfigurer::disable);
+
+        //HTTP Basic 인증 방식 비활성화
+        http.httpBasic(AbstractHttpConfigurer::disable);
+
+        //세션 STATELESS
+        // 시큐리티는 기본적으로 세션을 사용
+        // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 Stateless 로 설정
+        http.sessionManagement((session) -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        //cors 설정
+        http.cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfig.corsFilter()));
+
+        //경로별 인가작업
+        http.csrf(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/api/auth/**"),
+                                new AntPathRequestMatcher("/error"),
                                 new AntPathRequestMatcher("/api/notification/activity/subscribe/**")
                         ).permitAll()
                         .anyRequest().authenticated())

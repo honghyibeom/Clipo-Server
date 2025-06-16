@@ -1,106 +1,116 @@
 package myproject.cliposerver.service.Image;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import io.awspring.cloud.s3.ObjectMetadata;
+import io.awspring.cloud.s3.S3Operations;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class S3ImageService {
-    private final AmazonS3 s3Client;
 
-    @Value("${cloud.aws.s3.bucketName}")
+    private final S3Client s3Client;
+
+    @Value("${spring.cloud.aws.s3.bucket}")
     private String bucket;
-    public List<String> uploadFileList(List<MultipartFile> multipartFile) {
-        List<String> fileNameList = new ArrayList<>();
 
-        multipartFile.forEach(file -> {
+    public List<String> uploadFileList(List<MultipartFile> multipartFileList) {
+        List<String> fileNameList = new ArrayList<>();
+        multipartFileList.forEach(file -> {
             String name = uploadFile(file);
             fileNameList.add(name);
         });
-
         return fileNameList;
     }
 
     public String uploadFile(MultipartFile multipartFile) {
-            String fileName = createFileName(multipartFile.getOriginalFilename());
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(multipartFile.getSize());
-            objectMetadata.setContentType(multipartFile.getContentType());
+        String fileName = createFileName(multipartFile.getOriginalFilename());
 
-            try(InputStream inputStream = multipartFile.getInputStream()) {
-                s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-            } catch(IOException e) {
-                throw new CustomException(ErrorCode.PUT_OBJECT_EXCEPTION);
-            }
-
-        return "https://clipo-bucket-123123.s3.ap-northeast-2.amazonaws.com/"+fileName;
-    }
-
-    // 파일 삭제
-    public void deleteFile(String fileName) {
-        String newFileName = extractFileName(fileName);
-        s3Client.deleteObject(new DeleteObjectRequest(bucket, newFileName));
-    }
-
-    // 파일 존재여부
-    public boolean doesFileExist(String fileName) {
-        String newFileName = extractFileName(fileName);
         try {
-            return s3Client.doesObjectExist(bucket, newFileName);
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .contentType(multipartFile.getContentType())
+                    .acl(ObjectCannedACL.PUBLIC_READ)
+                    .build();
+
+            s3Client.putObject(request, RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.PUT_OBJECT_EXCEPTION);
+        }
+
+        return "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + fileName;
+    }
+
+    public void deleteFile(String fileUrl) {
+        String fileName = extractFileName(fileUrl);
+
+        try {
+            DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .build();
+
+            s3Client.deleteObject(deleteRequest);
         } catch (Exception e) {
-            log.error("Error while checking file existence in S3", e);
+            log.error("S3 delete error", e);
+            throw new CustomException(ErrorCode.S3_DELETE_EXCEPTION);
+        }
+    }
+
+    public boolean doesFileExist(String fileUrl) {
+        String fileName = extractFileName(fileUrl);
+        try {
+            HeadObjectRequest headRequest = HeadObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(fileName)
+                    .build();
+
+            s3Client.headObject(headRequest);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        } catch (Exception e) {
+            log.error("S3 check existence error", e);
             throw new CustomException(ErrorCode.S3_CHECK_FILE_EXISTENCE_EXCEPTION);
         }
     }
 
-    public String extractFileName(String fullUrl) {
-        String prefix = "https://clipo-bucket-123123.s3.ap-northeast-2.amazonaws.com/";
+    private String extractFileName(String fullUrl) {
+        String prefix = "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/";
         return fullUrl.replace(prefix, "");
     }
 
-    // 파일명 중복 방지 (UUID)
-    private String createFileName(String fileName) {
-        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
+    private String createFileName(String originalFileName) {
+        return UUID.randomUUID().toString().concat(getFileExtension(originalFileName));
     }
-    // 파일 유효성 검사
+
     private String getFileExtension(String fileName) {
-        if (fileName.length() == 0) {
+        if (fileName == null || fileName.length() == 0 || !fileName.contains(".")) {
             throw new CustomException(ErrorCode.INVALID_FILE_EXTENTION);
         }
-        ArrayList<String> fileValidate = new ArrayList<>();
-        fileValidate.add(".jpg");
-        fileValidate.add(".jpeg");
-        fileValidate.add(".png");
-        fileValidate.add(".JPG");
-        fileValidate.add(".JPEG");
-        fileValidate.add(".PNG");
-        String idxFileName = fileName.substring(fileName.lastIndexOf("."));
-        if (!fileValidate.contains(idxFileName)) {
+
+        String ext = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+        List<String> validExts = List.of(".jpg", ".jpeg", ".png");
+        if (!validExts.contains(ext)) {
             throw new CustomException(ErrorCode.NO_FILE_EXTENTION);
         }
-        return fileName.substring(fileName.lastIndexOf("."));
+
+        return ext;
     }
 }
-
-
