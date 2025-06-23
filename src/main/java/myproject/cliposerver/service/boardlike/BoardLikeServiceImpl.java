@@ -6,6 +6,8 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.entity.*;
 import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
@@ -92,17 +94,42 @@ public class BoardLikeServiceImpl implements BoardLikeService {
                 .build();
     }
     private void insertNotification(Member sender, Board board) {
-        Notification notification = Notification.builder()
-                .type(NoteEnum.like.name())
-                .sender(sender)
-                .board(board)
-                .receiver(board.getMember())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notificationRepository.save(notification);
 
-        // 알림 전달
-        notificationService.sendNotification(board.getMember().getEmail(), "notification");
+        if(!sender.equals(board.getMember())) {
+            Notification notification = Notification.builder()
+                    .type(NoteEnum.like)
+                    .sender(sender)
+                    .board(board)
+                    .receiver(board.getMember())
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            notificationRepository.save(notification);
+
+            NoteInfoSSEDTO sseDTO = NoteInfoSSEDTO.builder()
+                    .type(notification.getType())
+                    .from(sender.getName())
+                    .bno(board.getBno())
+                    .rno(null) // 댓글 알림이 아니므로 rno는 null
+                    .build();
+
+            // 알림 전달
+            notificationService.sendNotification(board.getMember().getEmail(),
+                    NoteInfoResponseDTO.builder()
+                            .type(NoteEnum.like.name())
+                            .bno(board.getBno())
+                            .boardOneImage(board.getBoardImageList() != null ?
+                                    board.getBoardImageList().get(0).getSrc() : null)
+                            .rno(null)
+                            .email(sender.getEmail())
+                            .from(sender.getName())
+                            .userProfileImage(sender.getProfileImage())
+                            .isFollowing(notification.getType().equals(NoteEnum.follow) ?
+                                    followRepository.existsByFromMemberAndToMember(sender, board.getMember()) : null)
+                            .createAt(LocalDateTime.now())
+                            .isRead(false)
+                            .build()
+                    );
+        }
     }
 }

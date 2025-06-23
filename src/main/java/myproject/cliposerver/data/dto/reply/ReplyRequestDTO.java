@@ -6,6 +6,8 @@ import myproject.cliposerver.data.entity.Board;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.entity.Reply;
 
+import java.util.List;
+
 @Getter
 @Builder
 public class ReplyRequestDTO {
@@ -14,6 +16,7 @@ public class ReplyRequestDTO {
     private String content;
     private String originImage;
     private Long parentRno; // 자식댓글 생성 할 때 필요
+    private List<String> mentions;
 
     public Reply toEntity(Board board, Member member) {
         return Reply.builder()

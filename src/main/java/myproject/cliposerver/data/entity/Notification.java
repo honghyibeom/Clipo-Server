@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import myproject.cliposerver.data.enumerate.NoteEnum;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +31,7 @@ public class Notification {
     @JoinColumn(name = "reply")
     private Reply reply;
     @Column(nullable = false)
-    private String type;
+    private NoteEnum type;
     @Column(nullable = false)
     LocalDateTime createdAt;
     @Column(nullable = false)

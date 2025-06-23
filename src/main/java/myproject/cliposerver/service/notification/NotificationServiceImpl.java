@@ -6,6 +6,7 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.entity.Notification;
 import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
@@ -43,8 +44,9 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> result = pageResult.getContent();
 
         List<NoteInfoResponseDTO> noteInfoResponseDTOList = result.stream().map(noti ->
+
                 NoteInfoResponseDTO.builder()
-                        .type(noti.getType())
+                        .type(noti.getType().name())
                         .bno(noti.getBoard() != null ? noti.getBoard().getBno() : null)
                         .boardOneImage( noti.getBoard() != null &&
                                 noti.getBoard().getBoardImageList() != null &&
@@ -55,7 +57,7 @@ public class NotificationServiceImpl implements NotificationService {
                         .email(noti.getSender().getEmail())
                         .from(noti.getSender().getName())
                         .userProfileImage(noti.getSender().getProfileImage())
-                        .isFollowing(noti.getType().equals(NoteEnum.follow.getType()) ?
+                        .isFollowing(noti.getType().equals(NoteEnum.follow) ?
                                 followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender())
                                 : null)
                         .createAt(LocalDateTime.now())
@@ -104,13 +106,13 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     // 알림을 언제 줘야하는지 정해야됨.
-    public void sendNotification(String email, String message) {
+    public void sendNotification(String email, NoteInfoResponseDTO noteInfoResponseDTO) {
         SseEmitter emitter = emitters.get(email);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .name("notification")
-                        .data(message));
+                        .data(noteInfoResponseDTO));
             } catch (IOException e) {
                 emitter.completeWithError(e);
                 emitters.remove(email);

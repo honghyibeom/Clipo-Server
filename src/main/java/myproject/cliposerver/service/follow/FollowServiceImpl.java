@@ -6,6 +6,8 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.entity.Notification;
@@ -119,16 +121,32 @@ public class FollowServiceImpl implements FollowService{
     }
 
     private void insertNotification(Member toMember, UserDetailsImpl userDetails) {
-        Notification notification = Notification.builder()
-                .type(NoteEnum.follow.name())
-                .sender(userDetails.getMember())
-                .receiver(toMember)
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notificationRepository.save(notification);
 
-        // 알림 전달
-        notificationService.sendNotification(toMember.getEmail(), "notification");
+        if (!userDetails.getMember().equals(toMember)) {
+            Notification notification = Notification.builder()
+                    .type(NoteEnum.follow)
+                    .sender(userDetails.getMember())
+                    .receiver(toMember)
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            notificationRepository.save(notification);
+
+            // 알림 전달
+            notificationService.sendNotification(toMember.getEmail(),
+                    NoteInfoResponseDTO.builder()
+                            .type(NoteEnum.follow.name())
+                            .bno(null)
+                            .boardOneImage(null)
+                            .rno(null)
+                            .email(userDetails.getEmail())
+                            .from(userDetails.getUsername())
+                            .userProfileImage(userDetails.getMember().getProfileImage())
+                            .isFollowing(followRepository.existsByFromMemberAndToMember(toMember, userDetails.getMember()))
+                            .createAt(LocalDateTime.now())
+                            .isRead(false)
+                            .build()
+                    );
+        }
     }
 }

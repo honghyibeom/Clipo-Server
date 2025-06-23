@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.dto.reply.PageNumberResponseDTO;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
@@ -16,10 +18,7 @@ import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.data.enumerate.TypeOfPost;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
-import myproject.cliposerver.repository.BoardRepository;
-import myproject.cliposerver.repository.NotificationRepository;
-import myproject.cliposerver.repository.ReplyLikeRepository;
-import myproject.cliposerver.repository.ReplyRepository;
+import myproject.cliposerver.repository.*;
 import myproject.cliposerver.service.Image.S3ImageService;
 import myproject.cliposerver.service.notification.NotificationService;
 import org.springframework.data.domain.Page;
@@ -42,6 +41,8 @@ public class ReplyServiceImpl implements ReplyService {
     private final S3ImageService imageService;
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
+    private final MemberRepository memberRepository;
+    private final FollowRepository followRepository;
 
     @Transactional
     public ResponseDTO createReply(ReplyRequestDTO replyRequestDTO, UserDetailsImpl userDetails, MultipartFile commentImage) {
@@ -62,7 +63,7 @@ public class ReplyServiceImpl implements ReplyService {
             replyRepository.save(reply);
 
             //알림 생성
-            insertNotification(userDetails.getMember(), reply);
+            insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
 
             return ResponseDTO.builder()
                     .message("자식 댓글 생성 완료")
@@ -80,7 +81,7 @@ public class ReplyServiceImpl implements ReplyService {
             replyRepository.save(reply);
 
             //알림 생성
-            insertNotification(userDetails.getMember(), reply);
+            insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
 
             return ResponseDTO.builder()
                     .message("댓글 생성 완료")
@@ -288,20 +289,90 @@ public class ReplyServiceImpl implements ReplyService {
         }
     }
 
-    private void insertNotification(Member sender, Reply reply) {
-        Notification notification = Notification.builder()
-                .type(NoteEnum.reply.name())
-                .sender(sender)
-                .board(reply.getBoard())
-                .reply(reply)
-                .receiver(reply.getWriter())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notificationRepository.save(notification);
+    private void insertReplyCreateNotification(Member sender, Reply reply, List<String> mentions) {
+        List<Notification> notifications = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
 
-        // 알림 전달
-        notificationService.sendNotification(reply.getWriter().getEmail(), "notification");
+        // [1] 게시글 작성자에게 알림 (댓글일 때)
+        if (reply.getParent() == null) { // 일반 댓글
+            Member boardWriter = reply.getBoard().getMember();
+            if (!boardWriter.equals(sender)) {
+                notifications.add(Notification.builder()
+                        .type(NoteEnum.reply)
+                        .sender(sender)
+                        .receiver(boardWriter)
+                        .board(reply.getBoard())
+                        .reply(reply)
+                        .isRead(false)
+                        .createdAt(now)
+                        .build());
+            }
+        }
+
+        // [2] 멘션된 사용자
+        if (mentions != null) {
+            insertReplyEditNotification(sender, reply, mentions);
+        }
+
+        // 저장 및 SSE 전송
+        notificationRepository.saveAll(notifications);
+        notifications.forEach(note -> {
+            notificationService.sendNotification(note.getReceiver().getEmail(),
+                    NoteInfoResponseDTO.builder()
+                            .type(note.getType().name())
+                            .bno(note.getBoard().getBno())
+                            .boardOneImage(null)
+                            .rno(reply.getRno())
+                            .email(sender.getEmail())
+                            .from(sender.getEmail())
+                            .userProfileImage(sender.getProfileImage())
+                            .isFollowing(followRepository.existsByFromMemberAndToMember(note.getReceiver(), sender))
+                            .createAt(now)
+                            .isRead(false)
+                            .build());
+        });
     }
+
+    private void insertReplyEditNotification(Member sender, Reply reply, List<String> mentions) {
+        if (mentions == null || mentions.isEmpty()) return;
+
+        List<Notification> notifications = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for (String email : mentions) {
+            memberRepository.findByEmail(email).ifPresent(mentionedUser -> {
+                if (!mentionedUser.equals(sender)) {
+                    notifications.add(Notification.builder()
+                            .type(NoteEnum.mention)
+                            .sender(sender)
+                            .receiver(mentionedUser)
+                            .board(reply.getBoard())
+                            .reply(reply)
+                            .isRead(false)
+                            .createdAt(now)
+                            .build());
+                }
+            });
+        }
+
+        notificationRepository.saveAll(notifications);
+        notifications.forEach(note -> {
+            notificationService.sendNotification(note.getReceiver().getEmail(),
+                    NoteInfoResponseDTO.builder()
+                            .type(note.getType().name())
+                            .bno(note.getBoard().getBno())
+                            .boardOneImage(null)
+                            .rno(reply.getRno())
+                            .email(sender.getEmail())
+                            .from(sender.getEmail())
+                            .userProfileImage(sender.getProfileImage())
+                            .isFollowing(followRepository.existsByFromMemberAndToMember(note.getReceiver(), sender))
+                            .createAt(now)
+                            .isRead(false)
+                            .build());
+        });
+    }
+
+
 
 }

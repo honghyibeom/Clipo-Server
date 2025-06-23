@@ -7,6 +7,8 @@ import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.*;
 
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -65,7 +68,8 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.save(board);
 
         //알림기록 생성
-        insertNotification(userDetails.getMember(), board);
+        insertLongtimeNotification(userDetails.getMember(), board);
+        insertMentionNotification(userDetails.getMember(), board, boardRequestDTO.getMentions());
 
         return ResponseDTO.builder()
                 .message("게시글 생성")
@@ -129,6 +133,9 @@ public class BoardServiceImpl implements BoardService {
 
         // 변경 사항 저장
         boardRepository.save(board);
+
+        //멘션 알림
+        insertMentionNotification(userDetails.getMember(), board, boardRequestDTO.getMentions());
 
         return ResponseDTO.builder()
                 .message("게시글 수정 완료")
@@ -367,29 +374,92 @@ public class BoardServiceImpl implements BoardService {
             throw new CustomException(ErrorCode.NOT_EQUALS_USER);
         }
     }
-    private void insertNotification(Member sender, Board board) {
-        //최근 7일 이내에 접속한 팔로워들
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
 
+    private void insertLongtimeNotification(Member sender, Board board) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Optional<Board> lastBoard = boardRepository.findTopByMemberOrderByRegDateDesc(sender);
+        boolean isLongTime = lastBoard.isEmpty() ||
+                ChronoUnit.DAYS.between(lastBoard.get().getRegDate(), now) >= 30;
+
+        if (!isLongTime) return;
+
+        LocalDateTime sevenDaysAgo = now.minusDays(7);
         List<Follow> follows = followRepository.findRecentFollowers(sender.getEmail(), sevenDaysAgo);
 
         List<Notification> notifications = follows.stream()
-                        .map(follow ->
-                                Notification.builder()
-                                .type(NoteEnum.longtime.name())
-                                .isRead(false)
-                                .createdAt(LocalDateTime.now())
-                                .board(board)
-                                .receiver(follow.getFromMember())
-                                .sender(sender)
-                                .build()
-                        ).toList();
+                .filter(follow -> !follow.getFromMember().equals(sender))
+                .map(follow -> Notification.builder()
+                        .type(NoteEnum.longtime)
+                        .isRead(false)
+                        .createdAt(now)
+                        .board(board)
+                        .receiver(follow.getFromMember())
+                        .sender(sender)
+                        .build())
+                .toList();
+
         notificationRepository.saveAll(notifications);
 
-        //SSE 연결된 유저에게만 실시간 전송
-        notifications.forEach(notification -> {
-            String email = notification.getReceiver().getEmail();
-                notificationService.sendNotification(email, "notification");
-        });
+        notifications.forEach(notification ->
+                notificationService.sendNotification(notification.getReceiver().getEmail(),
+                        NoteInfoResponseDTO.builder()
+                                .type(NoteEnum.longtime.name())
+                                .bno(board.getBno())
+                                .boardOneImage(board.getBoardImageList() != null ?
+                                        board.getBoardImageList().get(0).getSrc() : null)
+                                .rno(null)
+                                .email(sender.getEmail())
+                                .from(sender.getName())
+                                .userProfileImage(sender.getProfileImage())
+                                .isFollowing(notification.getType().equals(NoteEnum.follow) ?
+                                        followRepository.existsByFromMemberAndToMember(notification.getReceiver(), notification.getSender())
+                                        : null)
+                                .createAt(LocalDateTime.now())
+                                .isRead(false)
+                                .build()));
+    }
+
+    private void insertMentionNotification(Member sender, Board board, List<String> mentions) {
+        if (mentions == null || mentions.isEmpty()) return;
+
+        LocalDateTime now = LocalDateTime.now();
+        List<Notification> notifications = new ArrayList<>();
+
+        for (String email : mentions) {
+            memberRepository.findByEmail(email).ifPresent(mentionedMember -> {
+                if (!mentionedMember.equals(sender)) {
+                    Notification mentionNote = Notification.builder()
+                            .type(NoteEnum.mention)
+                            .isRead(false)
+                            .createdAt(now)
+                            .board(board)
+                            .receiver(mentionedMember)
+                            .sender(sender)
+                            .build();
+                    notifications.add(mentionNote);
+                }
+            });
+        }
+
+        notificationRepository.saveAll(notifications);
+
+        notifications.forEach(notification ->
+                notificationService.sendNotification(notification.getReceiver().getEmail(),
+                        NoteInfoResponseDTO.builder()
+                                .type(NoteEnum.mention.name())
+                                .bno(board.getBno())
+                                .boardOneImage(board.getBoardImageList() != null ?
+                                        board.getBoardImageList().get(0).getSrc() : null)
+                                .rno(null)
+                                .email(sender.getEmail())
+                                .from(sender.getName())
+                                .userProfileImage(sender.getProfileImage())
+                                .isFollowing(notification.getType().equals(NoteEnum.follow) ?
+                                        followRepository.existsByFromMemberAndToMember(notification.getReceiver(), notification.getSender())
+                                        : null)
+                                .createAt(LocalDateTime.now())
+                                .isRead(false)
+                                .build()));
     }
 }

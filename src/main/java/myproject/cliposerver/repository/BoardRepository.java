@@ -31,4 +31,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "ORDER BY b.regDate DESC ")
     Page<Board> findAllByFollowing(@Param("me") Member me, Pageable pageable);
 
+    // 가장 최근에 게시글을 작성한 글조회
+    Optional<Board> findTopByMemberOrderByRegDateDesc(Member member);
+
 }

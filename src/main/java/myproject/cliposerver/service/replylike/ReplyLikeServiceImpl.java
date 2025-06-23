@@ -6,6 +6,8 @@ import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.entity.Notification;
 import myproject.cliposerver.data.entity.Reply;
@@ -99,19 +101,43 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
                 .build();
     }
     private void insertNotification(Member sender, Reply reply) {
-        Notification notification = Notification.builder()
-                .type(NoteEnum.like.name())
-                .sender(sender)
-                .board(reply.getBoard())
-                .reply(reply)
-                .receiver(reply.getWriter())
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-        notificationRepository.save(notification);
 
-        // 알림 전달
-        notificationService.sendNotification(reply.getWriter().getEmail(), "notification");
+        if (!sender.equals(reply.getWriter())) {
+            Notification notification = Notification.builder()
+                    .type(NoteEnum.like)
+                    .sender(sender)
+                    .board(reply.getBoard())
+                    .reply(reply)
+                    .receiver(reply.getWriter())
+                    .isRead(false)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            notificationRepository.save(notification);
+
+            NoteInfoSSEDTO sseDTO = NoteInfoSSEDTO.builder()
+                    .type(notification.getType())
+                    .from(sender.getName())
+                    .bno(reply.getBoard().getBno())
+                    .rno(reply.getRno())
+                    .build();
+
+            // 알림 전달
+            notificationService.sendNotification(reply.getWriter().getEmail(),
+                    NoteInfoResponseDTO.builder()
+                            .type(NoteEnum.like.name())
+                            .bno(reply.getBoard().getBno())
+                            .boardOneImage(null)
+                            .rno(reply.getRno())
+                            .email(sender.getEmail())
+                            .from(sender.getName())
+                            .userProfileImage(sender.getProfileImage())
+                            .isFollowing(notification.getType().equals(NoteEnum.follow) ?
+                                    followRepository.existsByFromMemberAndToMember(sender, reply.getWriter()) : null)
+                            .createAt(LocalDateTime.now())
+                            .isRead(false)
+                            .build()
+                    );
+        }
     }
 }
 

@@ -11,7 +11,7 @@ public enum NoteEnum {
     like("like"),
     longtime("longtime"),
     follow("follow"),
-    reference("reference");
+    mention("mention");
 
     private final String type;
 

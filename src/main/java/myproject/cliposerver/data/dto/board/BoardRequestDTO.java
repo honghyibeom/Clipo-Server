@@ -22,6 +22,8 @@ public class BoardRequestDTO {
     private Boolean isLikeVisible;
     @Schema(description = "댓글 허용 여부", example = "true")
     private Boolean isReplyAllowed;
+    @Schema(description = "언급", example = "@username")
+    private List<String> mentions;
 
     public Board toEntity(Member member){
         return Board.builder()

@@ -2,6 +2,8 @@ package myproject.cliposerver.service.notification;
 
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
+import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,7 +14,7 @@ public interface NotificationService {
     //sse연결
     SseEmitter subscribe(String email);
     //sse전송
-    void sendNotification(String email, String message);
+    void sendNotification(String email, NoteInfoResponseDTO noteInfoSSEDTO);
     //최초 unRead 조회
     ResponseDTO getUnRead(UserDetailsImpl userDetails);
     // unRead 수정
