@@ -95,7 +95,7 @@ public class BoardLikeServiceImpl implements BoardLikeService {
     }
     private void insertNotification(Member sender, Board board) {
 
-        if(!sender.equals(board.getMember())) {
+        if(!sender.getEmail().equals(board.getMember().getEmail())) {
             Notification notification = Notification.builder()
                     .type(NoteEnum.like)
                     .sender(sender)
@@ -106,19 +106,13 @@ public class BoardLikeServiceImpl implements BoardLikeService {
                     .build();
             notificationRepository.save(notification);
 
-            NoteInfoSSEDTO sseDTO = NoteInfoSSEDTO.builder()
-                    .type(notification.getType())
-                    .from(sender.getName())
-                    .bno(board.getBno())
-                    .rno(null) // 댓글 알림이 아니므로 rno는 null
-                    .build();
-
             // 알림 전달
             notificationService.sendNotification(board.getMember().getEmail(),
                     NoteInfoResponseDTO.builder()
                             .type(NoteEnum.like.name())
                             .bno(board.getBno())
-                            .boardOneImage(board.getBoardImageList() != null ?
+                            .boardOneImage(
+                                    board.getBoardImageList() != null && !board.getBoardImageList().isEmpty() ?
                                     board.getBoardImageList().get(0).getSrc() : null)
                             .rno(null)
                             .email(sender.getEmail())

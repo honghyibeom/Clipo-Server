@@ -296,7 +296,7 @@ public class ReplyServiceImpl implements ReplyService {
         // [1] 게시글 작성자에게 알림 (댓글일 때)
         if (reply.getParent() == null) { // 일반 댓글
             Member boardWriter = reply.getBoard().getMember();
-            if (!boardWriter.equals(sender)) {
+            if (!boardWriter.getEmail().equals(sender.getEmail())) {
                 notifications.add(Notification.builder()
                         .type(NoteEnum.reply)
                         .sender(sender)
@@ -341,7 +341,7 @@ public class ReplyServiceImpl implements ReplyService {
 
         for (String email : mentions) {
             memberRepository.findByEmail(email).ifPresent(mentionedUser -> {
-                if (!mentionedUser.equals(sender)) {
+                if (!mentionedUser.getEmail().equals(sender.getEmail())) {
                     notifications.add(Notification.builder()
                             .type(NoteEnum.mention)
                             .sender(sender)

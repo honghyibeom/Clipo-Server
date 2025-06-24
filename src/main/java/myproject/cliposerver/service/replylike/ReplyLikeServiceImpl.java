@@ -102,7 +102,7 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
     }
     private void insertNotification(Member sender, Reply reply) {
 
-        if (!sender.equals(reply.getWriter())) {
+        if (!sender.getEmail().equals(reply.getWriter().getEmail())) {
             Notification notification = Notification.builder()
                     .type(NoteEnum.like)
                     .sender(sender)
@@ -113,13 +113,6 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
                     .createdAt(LocalDateTime.now())
                     .build();
             notificationRepository.save(notification);
-
-            NoteInfoSSEDTO sseDTO = NoteInfoSSEDTO.builder()
-                    .type(notification.getType())
-                    .from(sender.getName())
-                    .bno(reply.getBoard().getBno())
-                    .rno(reply.getRno())
-                    .build();
 
             // 알림 전달
             notificationService.sendNotification(reply.getWriter().getEmail(),

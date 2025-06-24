@@ -388,7 +388,7 @@ public class BoardServiceImpl implements BoardService {
         List<Follow> follows = followRepository.findRecentFollowers(sender.getEmail(), sevenDaysAgo);
 
         List<Notification> notifications = follows.stream()
-                .filter(follow -> !follow.getFromMember().equals(sender))
+                .filter(follow -> !follow.getFromMember().getEmail().equals(sender.getEmail()))
                 .map(follow -> Notification.builder()
                         .type(NoteEnum.longtime)
                         .isRead(false)
@@ -428,7 +428,7 @@ public class BoardServiceImpl implements BoardService {
 
         for (String email : mentions) {
             memberRepository.findByEmail(email).ifPresent(mentionedMember -> {
-                if (!mentionedMember.equals(sender)) {
+                if (!mentionedMember.getEmail().equals(sender.getEmail())) {
                     Notification mentionNote = Notification.builder()
                             .type(NoteEnum.mention)
                             .isRead(false)
@@ -449,7 +449,8 @@ public class BoardServiceImpl implements BoardService {
                         NoteInfoResponseDTO.builder()
                                 .type(NoteEnum.mention.name())
                                 .bno(board.getBno())
-                                .boardOneImage(board.getBoardImageList() != null ?
+                                .boardOneImage(
+                                        board.getBoardImageList() != null && !board.getBoardImageList().isEmpty() ?
                                         board.getBoardImageList().get(0).getSrc() : null)
                                 .rno(null)
                                 .email(sender.getEmail())

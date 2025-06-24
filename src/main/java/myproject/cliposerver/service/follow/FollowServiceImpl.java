@@ -40,7 +40,7 @@ public class FollowServiceImpl implements FollowService{
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
         // 자기자신 팔로우 x
-        if (member.equals(userDetails.getMember())) {
+        if (member.getEmail().equals(userDetails.getMember().getEmail())) {
           throw new CustomException(ErrorCode.NOT_FOLLOW_SELF);
         }
 
@@ -137,7 +137,7 @@ public class FollowServiceImpl implements FollowService{
 
     private void insertNotification(Member toMember, UserDetailsImpl userDetails) {
 
-        if (!userDetails.getMember().equals(toMember)) {
+        if (!userDetails.getMember().getEmail().equals(toMember.getEmail())) {
             Notification notification = Notification.builder()
                     .type(NoteEnum.follow)
                     .sender(userDetails.getMember())
