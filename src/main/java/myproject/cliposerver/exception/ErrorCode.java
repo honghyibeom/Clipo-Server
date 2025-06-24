@@ -19,6 +19,7 @@ public enum ErrorCode {
     NOT_EXIST_REPLY("존재하지 않는 댓글",HttpStatus.BAD_REQUEST),
     NOT_EXIST_NOTIFICATION("존재하지 않는 알림",HttpStatus.BAD_REQUEST),
     NOT_EXIST_FOLLOW("팔로우가 되어있지 않습니다.",HttpStatus.BAD_REQUEST),
+    NOT_FOLLOW_SELF("자신을 팔로우 할 수 없습니다.",HttpStatus.BAD_REQUEST),
     EMPTY_FILE_EXCEPTION("파일이 없습니다.",HttpStatus.BAD_REQUEST),
     IO_EXCEPTION_ON_IMAGE_UPLOAD("S3 이미지 업로드 에러.",HttpStatus.BAD_REQUEST),
     NO_FILE_EXTENTION("파일 형식이 아닙니다.",HttpStatus.BAD_REQUEST),

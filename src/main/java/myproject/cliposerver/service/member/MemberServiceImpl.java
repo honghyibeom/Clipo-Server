@@ -185,6 +185,7 @@ public class MemberServiceImpl implements MemberService {
                     .email(member.getEmail())
                     .nickName(member.getName())
                     .profilePicture(member.getProfileImage())
+                    .following(followRepository.existsByFromMemberAndToMember(userDetails.getMember(), member))
                     .build();
             responseList.add(userInfoResponseDTO);
         }

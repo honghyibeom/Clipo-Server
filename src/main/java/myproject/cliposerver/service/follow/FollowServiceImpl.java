@@ -39,6 +39,16 @@ public class FollowServiceImpl implements FollowService{
         Member member = memberRepository.findByName(toMemberEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
+        // 자기자신 팔로우 x
+        if (member.equals(userDetails.getMember())) {
+          throw new CustomException(ErrorCode.NOT_FOLLOW_SELF);
+        }
+
+        // 이미 팔로우가 되어있다면 에러
+        if (followRepository.existsByFromMemberAndToMember(userDetails.getMember(), member)) {
+            throw new CustomException(ErrorCode.EXIST_USER);
+        }
+
         Follow follow = Follow.builder()
                 .fromMember(userDetails.getMember())
                 .toMember(member)
@@ -55,10 +65,15 @@ public class FollowServiceImpl implements FollowService{
 
     @Transactional
     public ResponseDTO unfollow(String toMemberEmail, UserDetailsImpl userDetails) {
-        Member Member = memberRepository.findByName(toMemberEmail)
+        Member member = memberRepository.findByName(toMemberEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
-        Follow follow = followRepository.findByFromMemberAndToMember(userDetails.getMember(), Member)
+        // 팔로우가 되어있지 않다면 에러
+        if (!followRepository.existsByFromMemberAndToMember(userDetails.getMember(), member)) {
+            throw new CustomException(ErrorCode.NOT_EXIST_USER);
+        }
+
+        Follow follow = followRepository.findByFromMemberAndToMember(userDetails.getMember(), member)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_FOLLOW));
 
         followRepository.delete(follow);

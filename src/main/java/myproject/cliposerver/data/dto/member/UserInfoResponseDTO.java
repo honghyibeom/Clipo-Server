@@ -9,4 +9,5 @@ public class UserInfoResponseDTO {
     private String email;
     private String nickName;
     private String profilePicture;
+    private Boolean following;
 }
