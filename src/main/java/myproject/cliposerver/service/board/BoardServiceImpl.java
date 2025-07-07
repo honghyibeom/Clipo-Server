@@ -206,8 +206,10 @@ public class BoardServiceImpl implements BoardService {
             List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
             List<String> mentions = new ArrayList<>();
 
-            for (Notification notification : notifications) {
-                mentions.add("@"+notification.getReceiver().getName());
+            if (!notifications.isEmpty()) {
+                for (Notification notification : notifications) {
+                    mentions.add("@"+notification.getReceiver().getName());
+                }
             }
             return ReplyInfoResponseDTO.builder()
                     .bno(reply.getBoard().getBno())
@@ -362,8 +364,10 @@ public class BoardServiceImpl implements BoardService {
         List<Notification> notifications = notificationRepository.findByBoardAndType(board, NoteEnum.mention);
         List<String> mentions = new ArrayList<>();
 
-        for (Notification notification : notifications) {
-            mentions.add("@"+notification.getReceiver().getName());
+        if (!notifications.isEmpty()) {
+            for (Notification notification : notifications) {
+                mentions.add("@"+notification.getReceiver().getName());
+            }
         }
 
         return BoardInfoResponseDTO.builder()

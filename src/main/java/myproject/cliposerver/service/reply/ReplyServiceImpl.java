@@ -187,8 +187,10 @@ public class ReplyServiceImpl implements ReplyService {
             List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
             List<String> mentions = new ArrayList<>();
 
-            for (Notification notification : notifications) {
-                mentions.add("@"+notification.getReceiver().getName());
+            if (!notifications.isEmpty()) {
+                for (Notification notification : notifications) {
+                    mentions.add("@"+notification.getReceiver().getName());
+                }
             }
 
 
@@ -282,8 +284,10 @@ public class ReplyServiceImpl implements ReplyService {
         List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
         List<String> mentions = new ArrayList<>();
 
-        for (Notification notification : notifications) {
-            mentions.add("@"+notification.getReceiver().getName());
+        if (!notifications.isEmpty()) {
+            for (Notification notification : notifications) {
+                mentions.add("@"+notification.getReceiver().getName());
+            }
         }
 
         return ReplyInfoResponseDTO.builder()
