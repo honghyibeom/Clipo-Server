@@ -3,6 +3,8 @@ package myproject.cliposerver.data.dto.reply;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Builder
 @Getter
 public class ReplyInfoResponseDTO {
@@ -19,4 +21,5 @@ public class ReplyInfoResponseDTO {
     private String contents;
     private String regDate;
     private Boolean isLike;
+    private List<String> mentions;
 }

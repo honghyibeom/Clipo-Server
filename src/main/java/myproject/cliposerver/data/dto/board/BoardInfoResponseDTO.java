@@ -18,6 +18,7 @@ public class BoardInfoResponseDTO {
     private Long numberOfComments;
     private String contents;
     private List<String> tags;
+    private List<String> mentions;
     private String regDate;
     private Boolean isLike;
     private Boolean isFollowing;

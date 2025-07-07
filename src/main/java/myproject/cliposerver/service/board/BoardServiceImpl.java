@@ -8,7 +8,6 @@ import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardInfoResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
 import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
-import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.dto.reply.ReplyInfoResponseDTO;
 import myproject.cliposerver.data.entity.*;
 
@@ -202,7 +201,15 @@ public class BoardServiceImpl implements BoardService {
         Page<Reply> pages = replyRepository.findByWriterOrderByRegDateDesc(member, pageRequest);
         List<Reply> result = pages.getContent();
 
-        List<ReplyInfoResponseDTO> responseList = result.stream().map(reply -> ReplyInfoResponseDTO.builder()
+        List<ReplyInfoResponseDTO> responseList = result.stream().map(reply -> {
+            //게시글에서 언급했던 사람 가져오기 "@"+"name" 형태로 List<String>으로 만들기
+            List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
+            List<String> mentions = new ArrayList<>();
+
+            for (Notification notification : notifications) {
+                mentions.add("@"+notification.getReceiver().getName());
+            }
+            return ReplyInfoResponseDTO.builder()
                     .bno(reply.getBoard().getBno())
                     .rno(reply.getRno())
                     .typeOfPost(TypeOfPost.reply.name())
@@ -215,8 +222,9 @@ public class BoardServiceImpl implements BoardService {
                     .contents(reply.getText())
                     .regDate(String.valueOf(reply.getRegDate()))
                     .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
-                    .build()
-                ).toList();
+                    .mentions(mentions)
+                    .build();
+                }).toList();
 
         PageResponseDTO<ReplyInfoResponseDTO> response = PageResponseDTO.<ReplyInfoResponseDTO>builder()
                 .data(responseList)
@@ -350,6 +358,13 @@ public class BoardServiceImpl implements BoardService {
     }
 
     private BoardInfoResponseDTO getBoardInfoResponseDTO(Board board, UserDetailsImpl userDetails) {
+        //게시글에서 언급했던 사람 가져오기 "@"+"name" 형태로 List<String>으로 만들기
+        List<Notification> notifications = notificationRepository.findByBoardAndType(board, NoteEnum.mention);
+        List<String> mentions = new ArrayList<>();
+
+        for (Notification notification : notifications) {
+            mentions.add("@"+notification.getReceiver().getName());
+        }
 
         return BoardInfoResponseDTO.builder()
                 .bno(board.getBno())
@@ -366,6 +381,7 @@ public class BoardServiceImpl implements BoardService {
                 .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(), board.getMember()))
                 .isReplyAllowed(board.getIsReplyAllowed())
                 .isLikeVisible(board.getIsLikeVisible())
+                .mentions(mentions)
                 .build();
     }
 
@@ -426,8 +442,14 @@ public class BoardServiceImpl implements BoardService {
         LocalDateTime now = LocalDateTime.now();
         List<Notification> notifications = new ArrayList<>();
 
-        for (String email : mentions) {
-            memberRepository.findByEmail(email).ifPresent(mentionedMember -> {
+
+        for (String nickname : mentions) {
+            nickname = nickname.trim();
+            if (nickname.startsWith("@")) {
+                nickname = nickname.substring(1);
+            }
+
+            memberRepository.findByName(nickname).ifPresent(mentionedMember -> {
                 if (!mentionedMember.getEmail().equals(sender.getEmail())) {
                     Notification mentionNote = Notification.builder()
                             .type(NoteEnum.mention)

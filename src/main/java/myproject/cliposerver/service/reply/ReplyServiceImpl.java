@@ -179,8 +179,19 @@ public class ReplyServiceImpl implements ReplyService {
         Page<Reply> pages = replyRepository.findByParentRnoOrderByRegDateAsc(rno, pageRequest);
         List<Reply> result = pages.getContent();
 
+
         List<ReplyInfoResponseDTO> responseList = new ArrayList<>();
         for (Reply reply : result) {
+
+            //게시글에서 언급했던 사람 가져오기 "@"+"name" 형태로 List<String>으로 만들기
+            List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
+            List<String> mentions = new ArrayList<>();
+
+            for (Notification notification : notifications) {
+                mentions.add("@"+notification.getReceiver().getName());
+            }
+
+
             ReplyInfoResponseDTO replyInfoResponseDTO = ReplyInfoResponseDTO.builder()
                     .parentRno(reply.getParent().getRno())
                     .bno(reply.getBoard().getBno())
@@ -195,6 +206,7 @@ public class ReplyServiceImpl implements ReplyService {
                     .contents(reply.getText())
                     .regDate(String.valueOf(reply.getRegDate()))
                     .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
+                    .mentions(mentions)
                     .build();
             responseList.add(replyInfoResponseDTO);
         }
@@ -266,6 +278,13 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     private ReplyInfoResponseDTO getReplyInfoResponseDTO(UserDetailsImpl userDetails, Reply reply) {
+        //게시글에서 언급했던 사람 가져오기 "@"+"name" 형태로 List<String>으로 만들기
+        List<Notification> notifications = notificationRepository.findByReplyAndType(reply, NoteEnum.mention);
+        List<String> mentions = new ArrayList<>();
+
+        for (Notification notification : notifications) {
+            mentions.add("@"+notification.getReceiver().getName());
+        }
 
         return ReplyInfoResponseDTO.builder()
                 .rno(reply.getRno())
@@ -280,6 +299,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .contents(reply.getText())
                 .regDate(String.valueOf(reply.getRegDate()))
                 .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
+                .mentions(mentions)
                 .build();
     }
 
