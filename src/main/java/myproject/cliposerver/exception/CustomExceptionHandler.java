@@ -5,13 +5,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice // 전역 예외 처리기
 @Slf4j
 public class CustomExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<Object> handleApiRequestException(CustomException customException) {
         log.error(customException.getErrorCode().getErrorMessage());
-        return ResponseEntity.status(customException.getErrorCode().getHttpStatus()).body(new CustomExceptionDTO(customException.getErrorCode()));
+        return ResponseEntity.
+                status(customException.getErrorCode().getHttpStatus())
+                .body(new CustomExceptionDTO(customException.getErrorCode()));
     }
 }
