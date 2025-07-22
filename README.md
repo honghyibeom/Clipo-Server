@@ -58,7 +58,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - 테그 검색
 - 게시글 검색
 
-#### 알림 기능
+#### 알림 기능(SSE)
 - 팔로우 알림
 - 좋아요 알림
 - 팔로잉 계정의 게시글을 오랜만에 올렸을때
@@ -70,4 +70,5 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ## 🖼️ View
 
 ## 📁 프로젝트 구조
+[트러블슈팅 - Google Drive.pdf](https://github.com/user-attachments/files/21357551/-.Google.Drive.pdf)
 
