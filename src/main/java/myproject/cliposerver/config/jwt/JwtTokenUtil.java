@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.config.security.UserDetailsServiceImpl;
 import myproject.cliposerver.data.entity.Member;
-import myproject.cliposerver.data.enumerate.Role;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
