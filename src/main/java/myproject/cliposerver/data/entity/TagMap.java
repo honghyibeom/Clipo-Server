@@ -23,4 +23,7 @@ public class TagMap {
     @JoinColumn(name = "tag")
     private Tag tag;
 
+    public void changeBoard(Board board) {
+        this.board = board;
+    }
 }

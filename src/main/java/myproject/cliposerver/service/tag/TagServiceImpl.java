@@ -87,20 +87,75 @@ public class TagServiceImpl implements TagService {
     @Override
     @Transactional
     public List<TagMap> updateTagMaps(List<String> tagWords, Board board) {
-        // 1. 기존 TagMap 목록 저장 (삭제 전)
+        // 1. 현재 Board 에 연결된 TagMap 목록 조회
         List<TagMap> oldTagMaps = tagMapRepository.findByBoard(board);
-        Set<Tag> oldTags = oldTagMaps.stream()
-                .map(TagMap::getTag)
+        Map<String, TagMap> oldTagMapByWord = oldTagMaps.stream()
+                .collect(Collectors.toMap(tm -> tm.getTag().getWord(), tm -> tm));
+
+        Set<String> oldWords = oldTagMapByWord.keySet();
+        Set<String> newWords = new HashSet<>(tagWords);
+
+        // 2. 삭제할 태그 (old - new)
+        Set<String> wordsToRemove = new HashSet<>(oldWords);
+        wordsToRemove.removeAll(newWords);
+
+        // 3. 추가할 태그 (new - old)
+        Set<String> wordsToAdd = new HashSet<>(newWords);
+        wordsToAdd.removeAll(oldWords);
+
+        // 4. 삭제 처리
+        List<TagMap> removedTagMaps = oldTagMaps.stream()
+                .filter(tm -> wordsToRemove.contains(tm.getTag().getWord()))
+                .toList();
+        tagMapRepository.deleteAll(removedTagMaps);
+
+        // 5. 고아 태그 정리 (아무 Board 에도 연결 안 된 Tag 제거)
+        cleanupUnusedTags(
+                removedTagMaps.stream()
+                        .map(TagMap::getTag)
+                        .collect(Collectors.toSet())
+        );
+
+        // 6. 추가할 태그 준비
+        List<Tag> existingTags = tagRepository.findAllByWordIn(new ArrayList<>(wordsToAdd));
+        Set<String> existingWords = existingTags.stream()
+                .map(Tag::getWord)
                 .collect(Collectors.toSet());
 
-        // 2. 기존 TagMap 삭제
-        tagMapRepository.deleteByBoard(board);
+        // 새로 생성해야 할 태그
+        List<String> newTagWords = wordsToAdd.stream()
+                .filter(word -> !existingWords.contains(word))
+                .toList();
 
-        // 3. 고아 Tag 있으면 제거 (아무 게시글에도 연결되지 않은 경우만)
-        cleanupUnusedTags(oldTags);
+        List<Tag> newTags = newTagWords.stream()
+                .map(word -> Tag.builder().word(word).build())
+                .toList();
 
-        // 새로 생성
-        return createTagMaps(tagWords, board);
+        List<Tag> savedNewTags = tagRepository.saveAll(newTags);
+
+        // 7. TagMap insert
+        List<Tag> tagsToAdd = new ArrayList<>(existingTags);
+        tagsToAdd.addAll(savedNewTags);
+
+        List<TagMap> newTagMaps = tagsToAdd.stream()
+                .map(tag -> TagMap.builder()
+                        .board(board)
+                        .tag(tag)
+                        .build())
+                .toList();
+
+        tagMapRepository.saveAll(newTagMaps);
+
+        // 8. 최종 TagMap = (유지 + 추가) 상태
+        List<TagMap> finalTagMaps = new ArrayList<>();
+        finalTagMaps.addAll(
+                oldTagMaps.stream()
+                        .filter(tm -> !wordsToRemove.contains(tm.getTag().getWord()))
+                        .toList()
+        );
+        finalTagMaps.addAll(newTagMaps);
+
+        return finalTagMaps;
     }
 
 

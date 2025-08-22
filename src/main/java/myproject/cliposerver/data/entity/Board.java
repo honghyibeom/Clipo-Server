@@ -65,8 +65,11 @@ public class Board extends BaseEntity {
     }
 
     public void changeTagMapList(List<TagMap> tagMapList) {
-        this.tagMapList = tagMapList;
+        this.tagMapList.clear(); // 기존 내용 제거 → orphanRemoval로 자동 DELETE 발생
+        for (TagMap tagMap : tagMapList) {
+            this.tagMapList.add(tagMap);
+            tagMap.changeBoard(this); // 연관관계 주인 설정
+        }
     }
-
 
 }
