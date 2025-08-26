@@ -46,6 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<NoteInfoResponseDTO> noteInfoResponseDTOList = result.stream().map(noti ->
 
                 NoteInfoResponseDTO.builder()
+                        .nno(noti.getNno())
                         .type(noti.getType().name())
                         .bno(noti.getBoard() != null ? noti.getBoard().getBno() : null)
                         .boardOneImage( noti.getBoard() != null &&

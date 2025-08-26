@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class NoteInfoResponseDTO {
+    private Long nno;
     private String type;
     private String email;
     private String from;
