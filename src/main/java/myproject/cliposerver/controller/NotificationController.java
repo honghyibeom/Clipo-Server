@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.service.notification.NotificationService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class NotificationController {
                                                        @PathVariable int pages) {
         return ResponseEntity.ok(notificationService.getNotification(userDetails, pages));
     }
-    @GetMapping(value = "/subscribe/{email}")
+    @GetMapping(value = "/subscribe/{email}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter ringNotification(@PathVariable String email) {
         return notificationService.subscribe(email);
     }
