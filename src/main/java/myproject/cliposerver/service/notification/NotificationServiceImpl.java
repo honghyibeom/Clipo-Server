@@ -112,7 +112,6 @@ public class NotificationServiceImpl implements NotificationService {
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
-                        .name("notification")
                         .data(noteInfoResponseDTO));
             } catch (IOException e) {
                 emitter.completeWithError(e);
