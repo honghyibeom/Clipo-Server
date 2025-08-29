@@ -109,6 +109,7 @@ public class BoardLikeServiceImpl implements BoardLikeService {
             // 알림 전달
             notificationService.sendNotification(board.getMember().getEmail(),
                     NoteInfoResponseDTO.builder()
+                            .nno(notification.getNno())
                             .type(NoteEnum.like.name())
                             .bno(board.getBno())
                             .boardOneImage(

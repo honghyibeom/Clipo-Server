@@ -117,6 +117,7 @@ public class ReplyLikeServiceImpl implements ReplyLikeService {
             // 알림 전달
             notificationService.sendNotification(reply.getWriter().getEmail(),
                     NoteInfoResponseDTO.builder()
+                            .nno(notification.getNno())
                             .type(NoteEnum.like.name())
                             .bno(reply.getBoard().getBno())
                             .boardOneImage(null)

@@ -343,6 +343,7 @@ public class ReplyServiceImpl implements ReplyService {
         notifications.forEach(note -> {
             notificationService.sendNotification(note.getReceiver().getEmail(),
                     NoteInfoResponseDTO.builder()
+                            .nno(note.getNno())
                             .type(note.getType().name())
                             .bno(note.getBoard().getBno())
                             .boardOneImage(null)
@@ -383,6 +384,7 @@ public class ReplyServiceImpl implements ReplyService {
         notifications.forEach(note -> {
             notificationService.sendNotification(note.getReceiver().getEmail(),
                     NoteInfoResponseDTO.builder()
+                            .nno(note.getNno())
                             .type(note.getType().name())
                             .bno(note.getBoard().getBno())
                             .boardOneImage(null)

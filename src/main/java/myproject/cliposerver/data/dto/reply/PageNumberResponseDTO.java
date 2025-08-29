@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PageNumberResponseDTO {
-    private long pageNumber;
+    private Long pageNumber;
 }

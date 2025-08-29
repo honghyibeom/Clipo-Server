@@ -150,6 +150,7 @@ public class FollowServiceImpl implements FollowService{
             // 알림 전달
             notificationService.sendNotification(toMember.getEmail(),
                     NoteInfoResponseDTO.builder()
+                            .nno(notification.getNno())
                             .type(NoteEnum.follow.name())
                             .bno(null)
                             .boardOneImage(null)

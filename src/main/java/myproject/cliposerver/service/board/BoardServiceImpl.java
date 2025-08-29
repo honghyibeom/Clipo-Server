@@ -424,6 +424,7 @@ public class BoardServiceImpl implements BoardService {
         notifications.forEach(notification ->
                 notificationService.sendNotification(notification.getReceiver().getEmail(),
                         NoteInfoResponseDTO.builder()
+                                .nno(notification.getNno())
                                 .type(NoteEnum.longtime.name())
                                 .bno(board.getBno())
                                 .boardOneImage(board.getBoardImageList() != null ?
@@ -473,6 +474,7 @@ public class BoardServiceImpl implements BoardService {
         notifications.forEach(notification ->
                 notificationService.sendNotification(notification.getReceiver().getEmail(),
                         NoteInfoResponseDTO.builder()
+                                .nno(notification.getNno())
                                 .type(NoteEnum.mention.name())
                                 .bno(board.getBno())
                                 .boardOneImage(
