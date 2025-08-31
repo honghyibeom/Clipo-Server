@@ -255,9 +255,17 @@ public class BoardServiceImpl implements BoardService {
             BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
             responseList.add(boardInfoResponseDTO);
         }
+
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(boardPages.getNumber())
+                .hasNext(boardPages.hasNext())
+                .hasPrev(boardPages.hasPrevious())
+                .build();
+
         return ResponseDTO.builder()
                 .message("좋아요한 포스트를 확인했습니다.")
-                .body(responseList)
+                .body(response)
                 .build();
     }
 
