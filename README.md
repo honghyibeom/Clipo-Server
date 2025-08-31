@@ -1,4 +1,4 @@
-# SpringBoot-Project-SNS
+# Clipo-SNS-Project
 - springBoot + React <br>
 SNS 웹 + 모바일 프로젝트 입니다. <br>
 
