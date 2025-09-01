@@ -15,55 +15,37 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
  - 팀원2  : 유현우 - React
 
 ### ⚙️ 개발 환경
-- `Java 17`
-- `JDK 17.0.14`
-- **IDE** : Intelij
-- **Framework** : Springboot(3.3.1)
-- **Database** : Maria DB(11xe)
-- **ORM** : JPA
+![Java](https://img.shields.io/badge/Java-17-007396?logo=java)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.3.1-6DB33F?logo=springboot)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
+![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?logo=hibernate)
+![MariaDB](https://img.shields.io/badge/MariaDB-11-blue?logo=mariadb)
+![Redis](https://img.shields.io/badge/Redis-Cache-red?logo=redis)
+![AWS S3](https://img.shields.io/badge/AWS-S3-orange?logo=amazon-aws)
+![Swagger](https://img.shields.io/badge/Swagger-API--Docs-brightgreen?logo=swagger)
 
 ### 📌 사용 기술
-- Spring Security
-- S3
-- Swagger
-- Redis , Sms
-- Sse
+- Spring Security (인증/인가)
+- JWT + OAuth2 (소셜 로그인)
+- AWS S3 (이미지 저장)
+- Redis (세션 관리, 문자 인증)
+- SMS API (회원가입 인증)
+- SSE (실시간 알림)
+- Swagger (API 문서화)
+
 ## 📌 주요 기능
-#### 로그인
-- jwt 방식 로그인
-- 소셜 로그인(OAuth2)
-- 토큰 검증
-- ID찾기, PW찾기
-- 로그인 시 쿠키(Cookie) 및 세션(Session) 생성
 
-#### 회원가입
-- ID 중복 체크
-- radis를 통한 문자인증
+| 기능            | 설명 |
+|-----------------|------|
+| **로그인**       | JWT 로그인, OAuth2 소셜 로그인, 토큰 검증, ID/PW 찾기, 쿠키/세션 발급 |
+| **회원가입**     | 아이디 중복 체크, Redis 기반 문자 인증 |
+| **마이페이지**   | 회원 정보 변경, 나의 게시글 및 댓글 관리 |
+| **게시글 관리**  | 게시글 CRUD, 이미지 업로드, 태그 작성, 좋아요/댓글 기능 |
+| **메인 페이지**  | 최신순 게시글 목록, 게시글 작성 |
+| **검색 기능**    | 사용자, 태그, 게시글 검색 |
+| **알림 기능(SSE)** | 팔로우/좋아요 알림, 팔로잉 계정의 활동 알림, 알림 기록 조회 |
 
-#### 마이 페이지
-- 회원정보 변경
-- 자신의 게시글 및 댓글 관리
-
-#### 게시글 CRUD
-- 게시글 및 이미지
-- 태그 작성 기능
-- 좋아요 기능
-- 댓글 기능
-#### 메인 페이지
-- 최신순으로 게시글 목록 보여줌
-- 게시글 작성 기능 
-
-#### 검색 기능
-- 유저 검색
-- 테그 검색
-- 게시글 검색
-
-#### 알림 기능(SSE)
-- 팔로우 알림
-- 좋아요 알림
-- 팔로잉 계정의 게시글을 오랜만에 올렸을때
-- 알림 기록 조회
-
+---
 ## 🗒 ERD
 ![image](https://github.com/user-attachments/assets/9638913c-a4d9-4e54-966b-768d86739b18)
 
