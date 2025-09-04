@@ -61,7 +61,7 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
             String refreshToken = jwtUtil.createRefreshToken();
             member.changeToken(createToken, refreshToken);
             memberRepository.save(member);
-            return getResponseDTO(createToken, refreshToken);
+            return getResponseDTO(createToken, refreshToken, member.getEmail());
         }
         else {
             String createToken = jwtUtil.createToken(existData.get());
@@ -69,7 +69,7 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
             existData.get().changeToken(createToken, refreshToken);
             existData.get().changeLastLoginAt(LocalDateTime.now());
             memberRepository.save(existData.get());
-            return getResponseDTO(createToken, refreshToken);
+            return getResponseDTO(createToken, refreshToken, existData.get().getEmail());
         }
     }
 
@@ -147,13 +147,14 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         return new SocialUserInfoDTO(nickname, email, mobile, profileImage);
     }
 
-    private static ResponseDTO getResponseDTO(String createToken, String refreshToken) {
+    private static ResponseDTO getResponseDTO(String createToken, String refreshToken, String memberEmail) {
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(createToken)
                 .refreshToken(refreshToken)
                 .validateTime(ZonedDateTime.now(ZoneId.of("UTC"))
                         .plusHours(1L)
                         .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")))
+                .email(memberEmail)
                 .build();
 
 

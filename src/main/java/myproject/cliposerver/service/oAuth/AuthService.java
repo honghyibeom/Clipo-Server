@@ -74,6 +74,7 @@ public class AuthService {
                 .validateTime(ZonedDateTime.now(ZoneId.of("UTC"))
                         .plusHours(1L)
                         .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")))
+                .email(member.getEmail())
                 .build();
 
         return ResponseDTO.builder()

@@ -87,9 +87,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     public SseEmitter subscribe(String email) {
 
-        if(!memberRepository.existsByEmail(email)) {
-            throw new CustomException(ErrorCode.NOT_EQUALS_USER);
-        }
+//        if(!memberRepository.existsByEmail(email)) {
+//            throw new CustomException(ErrorCode.NOT_EQUALS_USER);
+//        }
+
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 무한 유지
         emitters.put(email, emitter);
 
