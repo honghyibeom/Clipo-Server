@@ -38,5 +38,5 @@ out/
 .vscode/
 
 # .gitignore 에 추가
-application.properties
-application-*.properties
+#application.properties
+#application-*.properties
