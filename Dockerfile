@@ -2,6 +2,11 @@
 FROM gradle:jdk17-jammy AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
+
+# gradlew 실행 권한 부여
+RUN chmod +x ./gradlew
+
+# 빌드 실행
 RUN ./gradlew build --no-daemon
 
 # 2단계: 실행
