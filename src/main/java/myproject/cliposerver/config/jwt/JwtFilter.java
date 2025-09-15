@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 
 @RequiredArgsConstructor
@@ -104,7 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             response.getWriter().write(objectMapper.writeValueAsString(responseDto));
         } catch (IOException ioException) {
-            log.error("servletResponse 사용중 에러 발생: {}", ioException.getStackTrace());
+            log.error("servletResponse 사용중 에러 발생: {}", Arrays.toString(ioException.getStackTrace()));
         }
     }
 }
