@@ -58,9 +58,7 @@ public class NotificationServiceImpl implements NotificationService {
                         .email(noti.getSender().getEmail())
                         .from(noti.getSender().getName())
                         .userProfileImage(noti.getSender().getProfileImage())
-                        .isFollowing(noti.getType().equals(NoteEnum.follow) ?
-                                followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender())
-                                : null)
+                        .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(), noti.getSender()))
                         .createAt(LocalDateTime.now())
                         .isRead(noti.getIsRead())
                         .build()).toList();
