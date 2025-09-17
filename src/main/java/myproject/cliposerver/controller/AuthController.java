@@ -72,4 +72,10 @@ public class AuthController {
         return ResponseEntity.ok(socialLoginService.login(socialLoginDTO));
     }
 
+    @Operation(summary = "서버 연결", description = "서버연결")
+    @GetMapping("/auth/wakeUp")
+    public ResponseEntity<ResponseDTO> wakeUp() {
+        return ResponseEntity.ok(ResponseDTO.builder().message("서버 일어남").build());
+    }
+
 }
