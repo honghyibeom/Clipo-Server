@@ -20,7 +20,7 @@ public class SmsServiceImpl implements SmsService {
     private final MemberRepository memberRepository;
 
     public ResponseDTO sendSms(PhoneNumberRequestDTO PhoneNumberRequestDTO) {
-        String phoneNumber = PhoneNumberRequestDTO.getPhoneNumber();
+        String phoneNumber = PhoneNumberRequestDTO.getPhone();
         int randomNumber = (int) (Math.random() * 9000) + 1000;
         String certificationNumber = String.valueOf(randomNumber);
         smsUtil.sendOne(phoneNumber, certificationNumber);

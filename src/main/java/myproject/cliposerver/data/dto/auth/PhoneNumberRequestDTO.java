@@ -8,5 +8,7 @@ import lombok.Getter;
 @Builder
 public class PhoneNumberRequestDTO {
     @Schema(description = "사용자 번호", example = "01012345678")
-    private String phoneNumber;
+    private String phone;
+    @Schema(description = "이메일", example = "2315@gmail.com")
+    private String email;
 }
