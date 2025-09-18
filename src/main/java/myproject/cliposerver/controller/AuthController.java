@@ -73,9 +73,15 @@ public class AuthController {
     }
 
     @Operation(summary = "서버 연결", description = "서버연결")
-    @GetMapping("/auth/wakeUp")
+    @PostMapping("/auth/wakeUp")
     public ResponseEntity<ResponseDTO> wakeUp() {
         return ResponseEntity.ok(ResponseDTO.builder().message("서버 일어남").build());
+    }
+
+    @Operation(summary = "게스트 로그인 api", description = "로그인")
+    @PostMapping("/auth/guest/login")
+    public ResponseEntity<ResponseDTO> guestLogin(@RequestBody @Validated SignupRequestDTO signupRequestDTO) {
+        return ResponseEntity.ok(authService.guestLogin(signupRequestDTO));
     }
 
 }

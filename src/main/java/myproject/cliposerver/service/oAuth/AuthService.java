@@ -49,6 +49,18 @@ public class AuthService {
                .message("핸드폰 인증이 필요합니다.")
                .build();
     }
+    @Transactional
+    public ResponseDTO guestLogin(SignupRequestDTO signupRequestDTO){
+        if (getUser(signupRequestDTO.getEmail()).isPresent()) {
+            throw new CustomException(ErrorCode.EXIST_USER);
+        }
+        Member member = signupRequestDTO.toEntity();
+        member.changePassword(passwordEncoder.encode(member.getPassword()));
+        member.changeValidate(true);
+        memberRepository.save(member);
+
+        return login(LoginRequestDTO.builder().email(member.getEmail()).password(signupRequestDTO.getPassword()).build());
+    }
 
     @Transactional
     public ResponseDTO login(LoginRequestDTO loginRequestDTO) {
