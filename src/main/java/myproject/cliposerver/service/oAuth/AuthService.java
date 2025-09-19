@@ -10,6 +10,7 @@ import myproject.cliposerver.data.dto.auth.LoginResponseDTO;
 import myproject.cliposerver.data.dto.auth.SignupRequestDTO;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.enumerate.DefaultProfile;
+import myproject.cliposerver.data.enumerate.Role;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.repository.MemberRepository;
@@ -52,11 +53,19 @@ public class AuthService {
     @Transactional
     public ResponseDTO guestLogin(SignupRequestDTO signupRequestDTO){
         if (getUser(signupRequestDTO.getEmail()).isPresent()) {
-            throw new CustomException(ErrorCode.EXIST_USER);
+            return login(LoginRequestDTO.builder().email(signupRequestDTO.getEmail()).password(signupRequestDTO.getPassword()).build());
         }
-        Member member = signupRequestDTO.toEntity();
-        member.changePassword(passwordEncoder.encode(member.getPassword()));
-        member.changeValidate(true);
+        Member member = Member.builder()
+                .email(signupRequestDTO.getEmail())
+                .password(passwordEncoder.encode(signupRequestDTO.getPassword()))
+                .phone("99999999999")
+                .profileImage("Neo")
+                .role(Role.USER)
+                .backgroundImage("NeoBg")
+                .description("Matrix Controller")
+                .birth("1999-01-01")
+                .location("Matrix")
+                .build();
         memberRepository.save(member);
 
         return login(LoginRequestDTO.builder().email(member.getEmail()).password(signupRequestDTO.getPassword()).build());
