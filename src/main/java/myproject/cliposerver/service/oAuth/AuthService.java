@@ -60,6 +60,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(signupRequestDTO.getPassword()))
                 .phone("99999999999")
                 .profileImage("Neo")
+                .isValidate(true)
                 .role(Role.USER)
                 .backgroundImage("NeoBg")
                 .description("Matrix Controller")
