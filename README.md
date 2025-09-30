@@ -50,8 +50,11 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ![image](https://github.com/user-attachments/assets/9638913c-a4d9-4e54-966b-768d86739b18)
 
 ## 🖼️ View
+<img width="493" height="864" alt="image" src="https://github.com/user-attachments/assets/d15ce3b1-a0a3-490b-9348-22f3a8a867e8" />
+
 
 ## 📁 프로젝트 구조
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/01631915-9e25-4b0c-a7c9-87d03bc7ee8d" />
 
 ## 🌟 문제 해결
 [트러블슈팅 - Google Drive.pdf](https://github.com/user-attachments/files/21357551/-.Google.Drive.pdf)
