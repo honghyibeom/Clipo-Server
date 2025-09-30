@@ -29,6 +29,8 @@ public class BoardRequestDTO {
         return Board.builder()
                 .content(this.content)
                 .member(member)
+                .likeCount(0)
+                .replyCount(0)
                 .isLikeVisible(this.isLikeVisible)
                 .isReplyAllowed(this.isReplyAllowed)
                 .build();

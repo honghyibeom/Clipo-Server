@@ -62,6 +62,9 @@ public class ReplyServiceImpl implements ReplyService {
             }
             replyRepository.save(reply);
 
+            board.changeReplyCount(board.getReplyCount() + 1);
+            boardRepository.save(board);
+
             //알림 생성
             insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
 
@@ -79,6 +82,9 @@ public class ReplyServiceImpl implements ReplyService {
                 reply.changeReplyImage(getImage);
             }
             replyRepository.save(reply);
+
+            board.changeReplyCount(board.getReplyCount() + 1);
+            boardRepository.save(board);
 
             //알림 생성
             insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
@@ -132,12 +138,18 @@ public class ReplyServiceImpl implements ReplyService {
     public ResponseDTO deleteReply(Long rno, UserDetailsImpl userDetails) {
         Reply reply = replyRepository.findById(rno)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_REPLY));
+
+        Board board = reply.getBoard();
         identification(reply.getWriter().getEmail(), userDetails.getEmail());
 
         if (reply.getReplyImage() != null) {
             imageService.deleteFile(reply.getReplyImage());
         }
         replyRepository.delete(reply);
+
+        board.changeReplyCount(board.getReplyCount() - 1);
+        boardRepository.save(board);
+
         return ResponseDTO.builder()
                 .message("댓글 삭제 완료")
                 .build();

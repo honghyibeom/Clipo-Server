@@ -6,23 +6,20 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Entity(name = "follow")
+@Entity(name = "bookmark")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Follow {
+public class Bookmark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long fno;
+    Long bookmarkId;
     @ManyToOne
-    @JoinColumn(name = "From_Member")
-    private Member fromMember;
+    @JoinColumn(name = "board")
+    Board board;
     @ManyToOne
-    @JoinColumn(name = "to_Member")
-    private Member toMember;
-    @Column
-    private LocalDateTime createdAt;
+    @JoinColumn(name = "member")
+    Member member;
+
 }

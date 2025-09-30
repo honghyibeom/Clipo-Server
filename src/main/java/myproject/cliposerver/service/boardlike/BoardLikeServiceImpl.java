@@ -46,6 +46,9 @@ public class BoardLikeServiceImpl implements BoardLikeService {
                 .build();
         boardLikeRepository.save(boardLike);
 
+        board.changeLikeCount(board.getLikeCount() + 1);
+        boardRepository.save(board);
+
         //알림테이블에 추가
         insertNotification(userDetails.getMember(), board);
 
@@ -59,6 +62,9 @@ public class BoardLikeServiceImpl implements BoardLikeService {
         Board board = boardRepository.findByBno(bno)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
         boardLikeRepository.deleteByBoardAndMember(board, userDetails.getMember());
+
+        board.changeLikeCount(board.getLikeCount() - 1);
+        boardRepository.save(board);
 
         return ResponseDTO.builder()
                 .message("좋아요 취소 완료")

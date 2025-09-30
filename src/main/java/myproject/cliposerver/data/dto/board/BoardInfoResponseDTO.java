@@ -24,4 +24,5 @@ public class BoardInfoResponseDTO {
     private Boolean isFollowing;
     private Boolean isLikeVisible;
     private Boolean isReplyAllowed;
+    private Double rankingScore;
 }

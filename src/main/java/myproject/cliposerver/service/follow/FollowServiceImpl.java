@@ -52,6 +52,7 @@ public class FollowServiceImpl implements FollowService{
         Follow follow = Follow.builder()
                 .fromMember(userDetails.getMember())
                 .toMember(member)
+                .createdAt(LocalDateTime.now())
                 .build();
         followRepository.save(follow);
 

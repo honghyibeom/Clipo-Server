@@ -68,7 +68,7 @@ public class BoardController {
     @GetMapping("/randomBoard/{page}")
     public ResponseEntity<ResponseDTO> getBoardRandomList(@PathVariable("page") int page,
                                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(boardService.getRandomBoard(page,userDetails));
+        return ResponseEntity.ok(boardService.getRecommendedBoard(page,userDetails));
     }
 
     @Operation(summary = "게시글 상세 조회", description = "게시글의 상세 내용을 조회하는 API")
@@ -90,6 +90,13 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> getBoardForFollowing(@PathVariable("page") int page,
                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.ok(boardService.getFollowingBoard(page, userDetails));
+    }
+
+    @Operation(summary = "북마크 기반 게시글", description = "북마크한 게시글만 나오도록 함")
+    @GetMapping("/get/postInfo/bookmark/{page}/")
+    public ResponseEntity<ResponseDTO> getBoardForBookmark(@PathVariable("page") int page,
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(boardService.getBookMarkBoard(page, userDetails));
     }
 
 }

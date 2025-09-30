@@ -45,6 +45,7 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
     private final TagService tagService;
+    private final BookMarkRepository bookMarkRepository;
 
     @Transactional
     public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages , UserDetailsImpl userDetails){
@@ -270,17 +271,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public ResponseDTO getRandomBoard(int page,UserDetailsImpl userDetails) {
+    public ResponseDTO getRecommendedBoard(int page, UserDetailsImpl userDetails) {
         PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Board> boardPages = boardRepository.findAllByOrderByRegDateDesc(pageRequest);
 
-        List<Board> result = boardPages.getContent();
-        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+        Page<Board> boardPages = boardRepository.findBoardsByRanking(userDetails.getEmail(), pageRequest);
 
-        for(Board board: result) {
-            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(board, userDetails);
-            responseList.add(boardInfoResponseDTO);
-        }
+        List<BoardInfoResponseDTO> responseList = boardPages.stream()
+                .map(board -> getBoardInfoResponseDTO(board, userDetails))
+                .toList();
+
         PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
                 .data(responseList)
                 .page(boardPages.getNumber())
@@ -289,7 +288,7 @@ public class BoardServiceImpl implements BoardService {
                 .build();
 
         return ResponseDTO.builder()
-                .message("메인페이지 조회")
+                .message("추천 피드 조회")
                 .body(response)
                 .build();
     }
@@ -367,6 +366,30 @@ public class BoardServiceImpl implements BoardService {
                 .build();
     }
 
+    @Override
+    public ResponseDTO getBookMarkBoard(int page, UserDetailsImpl userDetails) {
+        PageRequest pageRequest = PageRequest.of(page, 10);
+        Page<Bookmark> bookmarks = bookMarkRepository.findByMember(userDetails.getMember(), pageRequest);
+        List<Bookmark> result = bookmarks.getContent();
+
+        List<BoardInfoResponseDTO> responseList = new ArrayList<>();
+        for (Bookmark bookmark : result) {
+            BoardInfoResponseDTO boardInfoResponseDTO = getBoardInfoResponseDTO(bookmark.getBoard(), userDetails);
+            responseList.add(boardInfoResponseDTO);
+        }
+        PageResponseDTO<BoardInfoResponseDTO> response = PageResponseDTO.<BoardInfoResponseDTO>builder()
+                .data(responseList)
+                .page(bookmarks.getNumber())
+                .hasNext(bookmarks.hasNext())
+                .hasPrev(bookmarks.hasPrevious())
+                .build();
+
+        return ResponseDTO.builder()
+                .body(response)
+                .message("북마크 게시글 검색결과")
+                .build();
+    }
+
     private BoardInfoResponseDTO getBoardInfoResponseDTO(Board board, UserDetailsImpl userDetails) {
         //게시글에서 언급했던 사람 가져오기 "@"+"name" 형태로 List<String>으로 만들기
         List<Notification> notifications = notificationRepository.findByBoardAndType(board, NoteEnum.mention);
@@ -394,6 +417,7 @@ public class BoardServiceImpl implements BoardService {
                 .isReplyAllowed(board.getIsReplyAllowed())
                 .isLikeVisible(board.getIsLikeVisible())
                 .mentions(mentions)
+                .rankingScore(board.getRankingScore())
                 .build();
     }
 

@@ -27,6 +27,14 @@ public class Board extends BaseEntity {
     private Boolean isLikeVisible;
     @Column(nullable = false)
     private Boolean isReplyAllowed;
+    @Column
+    private Integer likeCount;
+    @Column
+    private Integer replyCount;
+
+    // 👇 JPA 테이블에는 없지만, 쿼리에서 SELECT로 가져올 수 있음
+    @Transient
+    private Double rankingScore;
 
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -46,6 +54,10 @@ public class Board extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bookmark> bookMarkList  = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notificationList  = new ArrayList<>();
 
     public void changeContent(String content) {
@@ -58,6 +70,14 @@ public class Board extends BaseEntity {
 
     public void changeReplyAllowed(Boolean replyAllowed) {
         isReplyAllowed = replyAllowed;
+    }
+
+    public void changeLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public void changeReplyCount(Integer replyCount) {
+        this.replyCount = replyCount;
     }
 
     public void changeBoardImageList(List<BoardImage> boardImageList) {

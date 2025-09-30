@@ -23,13 +23,15 @@ public interface BoardService {
     // 마이페이지 좋아요한 게시글 조회
     ResponseDTO getMyLikesResponse(int page, String username,UserDetailsImpl userDetails);
     // 메인페이지 게시글 조회
-    ResponseDTO getRandomBoard(int page,UserDetailsImpl userDetails);
+    ResponseDTO getRecommendedBoard(int page,UserDetailsImpl userDetails);
     // 게시글 조회
     ResponseDTO getDetailBoard(Long bno,UserDetailsImpl userDetails);
     // 테그로 게시글 검색(자동완성 x)
     ResponseDTO getBoardForTag(int page,UserDetailsImpl userDetails, String tag);
     // 팔로잉한 게시글만 나오도록
     ResponseDTO getFollowingBoard(int page,UserDetailsImpl userDetails);
+    // 북마크한 게시글만 나오도록
+    ResponseDTO getBookMarkBoard(int page,UserDetailsImpl userDetails);
 
 
 }
