@@ -52,7 +52,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ## 🖼️ View
 
 ## 📁 프로젝트 구조
-
+![img.png](img.png)
 ## 🌟 문제 해결
 [트러블슈팅 - Google Drive.pdf](https://github.com/user-attachments/files/21357551/-.Google.Drive.pdf)
 
