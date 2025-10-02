@@ -59,12 +59,13 @@ public class AuthService {
                 .email(signupRequestDTO.getEmail())
                 .password(passwordEncoder.encode(signupRequestDTO.getPassword()))
                 .phone("99999999999")
-                .profileImage("Neo")
+                .name("Neo")
+                .profileImage("https://elasticbeanstalk-ap-northeast-2-740783871476.s3.ap-northeast-2.amazonaws.com/portfolio/neo/neo.jpeg")
                 .isValidate(true)
                 .role(Role.USER)
-                .backgroundImage("NeoBg")
+                .backgroundImage("https://elasticbeanstalk-ap-northeast-2-740783871476.s3.ap-northeast-2.amazonaws.com/portfolio/neo/matrix_bg.jpeg")
                 .description("Matrix Controller")
-                .birth("1999-01-01")
+                .birth("????-??-??")
                 .location("Matrix")
                 .build();
         memberRepository.save(member);
