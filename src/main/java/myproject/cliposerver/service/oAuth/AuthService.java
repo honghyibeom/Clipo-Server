@@ -67,6 +67,7 @@ public class AuthService {
                 .description("Matrix Controller")
                 .birth("????-??-??")
                 .location("Matrix")
+                .isSocial(false)
                 .build();
         memberRepository.save(member);
 

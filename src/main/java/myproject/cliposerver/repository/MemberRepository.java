@@ -23,7 +23,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 유저가 맞는지 확인
     boolean existsByEmail(String email);
     // 검색으로 유저 정보 찾기
-    @Query("select m from member m where m.name like :search ")
+    @Query("select m from members m where m.name like :search ")
     Page<Member> findBySearch(@Param("search") String search, Pageable pageable);
 
     // 인증이 안된 유저 제거

@@ -48,6 +48,10 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 //    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+    implementation 'com.oracle.database.security:osdt_cert'
+    implementation 'com.oracle.database.security:oraclepki'
+    implementation 'com.oracle.database.security:osdt_core'
 }
 
 tasks.named('test') {
