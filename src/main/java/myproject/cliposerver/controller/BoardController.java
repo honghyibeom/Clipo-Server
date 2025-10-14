@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.board.BoardRequestDTO;
+import myproject.cliposerver.exception.CustomException;
+import myproject.cliposerver.exception.ErrorCode;
 import myproject.cliposerver.service.board.BoardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,6 +28,9 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> posting(@ModelAttribute BoardRequestDTO boardRequestDTO,
                                                @RequestPart(value = "boardImages", required = false) List<MultipartFile> boardImages,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
+        if (boardImages.size() > 20) {
+            throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        }
         return ResponseEntity.ok(boardService.createBoard(boardRequestDTO,boardImages ,userDetails));
     }
     @Operation(summary = "게시글 수정",description = "게시글 수정 api")
@@ -33,6 +38,9 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> update(@ModelAttribute BoardRequestDTO boardRequestDTO,
                                               @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
+        if (newImages.size() > 20) {
+            throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        }
         return ResponseEntity.ok(boardService.update(boardRequestDTO,newImages,userDetails));
     }
     @Operation(summary = "게시글 삭제",description = "게시글 삭제 api")

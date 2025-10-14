@@ -36,7 +36,9 @@ public enum ErrorCode {
     S3_DELETE_EXCEPTION("S3 이미지 삭제 실패...", HttpStatus.BAD_REQUEST),
     EXIST_IMAGE("기존이미지가 존재합니다.", HttpStatus.BAD_REQUEST),
     NOT_EXIST_TAG("테그가 존재하지 않습니다.", HttpStatus.BAD_REQUEST),
-    WRONG_REQUEST("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+    WRONG_REQUEST("잘못된 요청입니다.", HttpStatus.BAD_REQUEST),
+    UPLOAD_LIMIT_EXCEEDED("업로드한 이미지 갯수 초과", HttpStatus.BAD_REQUEST),
+    BUCKET_FULL("버킷 100GB 초과 관리자 문의", HttpStatus.BAD_REQUEST);
 
 
 
