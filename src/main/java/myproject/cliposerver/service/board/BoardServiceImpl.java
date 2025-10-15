@@ -19,6 +19,7 @@ import myproject.cliposerver.repository.*;
 import myproject.cliposerver.service.Image.S3ImageService;
 import myproject.cliposerver.service.notification.NotificationService;
 import myproject.cliposerver.service.tag.TagService;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationService notificationService;
     private final TagService tagService;
     private final BookMarkRepository bookMarkRepository;
+    private final Environment env;
 
     @Transactional
     public ResponseDTO createBoard(BoardRequestDTO boardRequestDTO, List<MultipartFile> boardImages , UserDetailsImpl userDetails){
@@ -272,10 +274,21 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public ResponseDTO getRecommendedBoard(int page, UserDetailsImpl userDetails) {
+
         PageRequest pageRequest = PageRequest.of(page, 10);
 
-        Page<Board> boardPages = boardRepository.findBoardsByRanking(userDetails.getEmail(), pageRequest);
+        String profile = env.getActiveProfiles().length > 0 ? env.getActiveProfiles()[0] : "local";
 
+        Page<Board> boardPages;
+
+        // ✅ 프로필에 따라 다른 쿼리 실행
+        if ("dev".equals(profile)) {
+            // 오라클용 쿼리 (SYSDATE, LN 등)
+            boardPages = boardRepository.findBoardsByRanking(userDetails.getEmail(), pageRequest);
+        } else {
+            // 로컬/H2용 쿼리 (NOW(), LOG 등)
+            boardPages = boardRepository.findBoardsByRankingH2(userDetails.getEmail(), pageRequest);
+        }
         List<BoardInfoResponseDTO> responseList = boardPages.stream()
                 .map(board -> getBoardInfoResponseDTO(board, userDetails))
                 .toList();

@@ -21,23 +21,22 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 좋아요한 게시글
     Page<Board> findByBoardLikeListMemberOrderByRegDateDesc(Member member, Pageable pageable);
 
-//    // 모든 게시글 h2 버전
-//    @Query(value = "SELECT b.*, " +
-//            "       (0.5 * (1.0 / (1 + TIMESTAMPDIFF(HOUR, b.regdate, NOW())))) + " +
-//            "       (0.25 * LOG(1 + b.like_count)) + " +
-//            "       (0.25 * LOG(1 + b.reply_count)) + " +
-//            "       (CASE WHEN b.user_info IN ( " +
-//            "            SELECT f.to_Member " +
-//            "            FROM follow f " +
-//            "            WHERE f.from_Member = (SELECT m.email FROM members m WHERE m.email = :email) " +
-//            "       ) THEN 0.1 ELSE 0 END) AS rankingScore " +
-//            "FROM board b " +
-//            "ORDER BY rankingScore DESC",
-//            countQuery = "SELECT count(*) FROM board",
-//            nativeQuery = true)
-//    Page<Board> findBoardsByRanking(@Param("email") String email, Pageable pageable);
-
     // 모든 게시글 h2 버전
+    @Query(value = "SELECT b.*, " +
+            "       (0.5 * (1.0 / (1 + TIMESTAMPDIFF(HOUR, b.regdate, NOW())))) + " +
+            "       (0.25 * LOG(1 + b.like_count)) + " +
+            "       (0.25 * LOG(1 + b.reply_count)) + " +
+            "       (CASE WHEN b.user_info IN ( " +
+            "            SELECT f.to_Member " +
+            "            FROM follow f " +
+            "            WHERE f.from_Member = (SELECT m.email FROM members m WHERE m.email = :email) " +
+            "       ) THEN 0.1 ELSE 0 END) AS rankingScore " +
+            "FROM board b " +
+            "ORDER BY rankingScore DESC",
+            countQuery = "SELECT count(*) FROM board",
+            nativeQuery = true)
+    Page<Board> findBoardsByRankingH2(@Param("email") String email, Pageable pageable);
+
     @Query(value = """
     SELECT b.*, 
            (0.5 * (1.0 / (1 + ((SYSDATE - CAST(b.regdate AS DATE)) * 24)))) +
