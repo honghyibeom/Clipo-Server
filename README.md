@@ -20,7 +20,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.3.1-6DB33F?logo=springboot)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)
 ![JPA](https://img.shields.io/badge/JPA-Hibernate-59666C?logo=hibernate)
-![MariaDB](https://img.shields.io/badge/MariaDB-11-blue?logo=mariadb)
+![OracleDB](https://img.shields.io/badge/OracleDB-19c-F80000?logo=oracle)
 ![Redis](https://img.shields.io/badge/Redis-Cache-red?logo=redis)
 ![AWS S3](https://img.shields.io/badge/AWS-S3-orange?logo=amazon-aws)
 ![Swagger](https://img.shields.io/badge/Swagger-API--Docs-brightgreen?logo=swagger)
@@ -29,7 +29,7 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 - Spring Security (인증/인가)
 - JWT + OAuth2 (소셜 로그인)
 - AWS S3 (이미지 저장)
-- Redis (세션 관리, 문자 인증)
+- Redis (문자 인증)
 - SMS API (회원가입 인증)
 - SSE (실시간 알림)
 - Swagger (API 문서화)
@@ -51,7 +51,17 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ![image](https://github.com/user-attachments/assets/9638913c-a4d9-4e54-966b-768d86739b18)
 
 ## 🖼️ View
-
+- 메인 페이지
+![img_2.png](img_2.png)
+- 마이 페이지
+![img_3.png](img_3.png)
+- 게시글
+![img_4.png](img_4.png)
+- 검색
+![img_5.png](img_5.png)
+- 활동
+![img_6.png](img_6.png)
+- 
 ## 📁 프로젝트 구조
 ![img_1.png](img_1.png)
 ## 🌟 문제 해결
