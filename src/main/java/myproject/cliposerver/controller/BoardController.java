@@ -28,8 +28,10 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> posting(@ModelAttribute BoardRequestDTO boardRequestDTO,
                                                @RequestPart(value = "boardImages", required = false) List<MultipartFile> boardImages,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){
-        if (boardImages.size() > 20) {
-            throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        if(boardImages != null){
+            if (boardImages.size() > 20) {
+                throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+            }
         }
         return ResponseEntity.ok(boardService.createBoard(boardRequestDTO,boardImages ,userDetails));
     }
@@ -38,8 +40,10 @@ public class BoardController {
     public ResponseEntity<ResponseDTO> update(@ModelAttribute BoardRequestDTO boardRequestDTO,
                                               @RequestPart(value = "newImages", required = false) List<MultipartFile> newImages,
                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
-        if (newImages.size() > 20) {
-            throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+        if(newImages != null){
+            if (newImages.size() > 20) {
+                throw new CustomException(ErrorCode.UPLOAD_LIMIT_EXCEEDED);
+            }
         }
         return ResponseEntity.ok(boardService.update(boardRequestDTO,newImages,userDetails));
     }
