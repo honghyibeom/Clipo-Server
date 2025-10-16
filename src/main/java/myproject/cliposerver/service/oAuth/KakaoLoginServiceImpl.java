@@ -137,14 +137,12 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         String nickname = jsonNode.get("kakao_account").get("profile").get("nickname").asText();
         String email = jsonNode.get("kakao_account").get("email").asText();
         String profileImage = jsonNode.get("kakao_account").get("profile").get("profile_image_url").asText();
-        String mobile = jsonNode.get("kakao_account").get("phone_number").asText();
 
         log.info(nickname);
         log.info(email);
         log.info(profileImage);
-        log.info(mobile);
 
-        return new SocialUserInfoDTO(nickname, email, mobile, profileImage);
+        return new SocialUserInfoDTO(nickname, email, null, profileImage);
     }
 
     private static ResponseDTO getResponseDTO(String createToken, String refreshToken, String memberEmail) {
