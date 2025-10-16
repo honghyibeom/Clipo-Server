@@ -4,7 +4,7 @@ SNS 웹 + 모바일 프로젝트 입니다. <br>
 
 ## 🖥️ 프로젝트 소개
 Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
-배포하여 주변 지인들과 함께 일상을 공유하는 앱을 만들고자 개발하였습니다.
+배포하여 주변 지인들과 함께 일상을 공유하는 앱을 만들고자 개발하였습니다. <br>
 링크 : https://clipofront.netlify.app/
 <br>
 
@@ -51,17 +51,8 @@ Thread Instagram 를 참고하여 만든 SNS 사이트입니다. <br>
 ![image](https://github.com/user-attachments/assets/9638913c-a4d9-4e54-966b-768d86739b18)
 
 ## 🖼️ View
-- 메인 페이지
-![img_2.png](img_2.png)
-- 마이 페이지
-![img_3.png](img_3.png)
-- 게시글
-![img_4.png](img_4.png)
-- 검색
-![img_5.png](img_5.png)
-- 활동
-![img_6.png](img_6.png)
-- 
+https://clipofront.netlify.app/
+
 ## 📁 프로젝트 구조
 ![img_1.png](img_1.png)
 ## 🌟 문제 해결
