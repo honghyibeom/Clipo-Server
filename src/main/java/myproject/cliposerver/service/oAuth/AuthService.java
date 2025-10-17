@@ -116,6 +116,7 @@ public class AuthService {
 
         return ResponseDTO.builder()
                 .message("임시 비밀번호 발급")
+                .body(code)
                 .build();
     }
 

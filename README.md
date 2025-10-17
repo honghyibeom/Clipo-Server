@@ -58,3 +58,7 @@ https://clipofront.netlify.app/
 ## 🌟 문제 해결
 [트러블슈팅 - Google Drive.pdf](https://github.com/user-attachments/files/21357551/-.Google.Drive.pdf)
 
+## 🔮 향후 개선 계획
+ - 소켓 통신을 이용한 그룹 채팅방 구현
+ - 모바일 앱 버전 출시
+ - 자잘한 버그 수정
