@@ -41,7 +41,7 @@ public class Member extends BaseEntity {
     private String accessToken;
     @Column(nullable = true, unique = true)
     private String refreshToken;
-    @ColumnDefault("false")
+    @ColumnDefault("0")
     private Boolean isValidate;
     @Column(nullable = true)
     private LocalDateTime lastLoginAt;
