@@ -40,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
     public ResponseDTO getNotification(UserDetailsImpl userDetails, int pages) {
         //알림 기록을 가져옴
         PageRequest pageRequest = PageRequest.of(pages, 7);
-        Page<Notification> pageResult = notificationRepository.getNotificationsByReceiver(userDetails.getMember(), pageRequest);
+        Page<Notification> pageResult = notificationRepository.getNotificationsByReceiverOrderByCreatedAtDesc(userDetails.getMember(), pageRequest);
         List<Notification> result = pageResult.getContent();
 
         List<NoteInfoResponseDTO> noteInfoResponseDTOList = result.stream().map(noti ->

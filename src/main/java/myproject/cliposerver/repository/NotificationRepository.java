@@ -21,7 +21,7 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     // 활동기록 조회
-    Page<Notification> getNotificationsByReceiver(Member receiver, Pageable pageable);
+    Page<Notification> getNotificationsByReceiverOrderByCreatedAtDesc(Member receiver, Pageable pageable);
 
     // 오전 3시가 되면 알림기록 삭제
     @Modifying
