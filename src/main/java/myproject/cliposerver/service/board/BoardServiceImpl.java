@@ -431,6 +431,7 @@ public class BoardServiceImpl implements BoardService {
                 .isLikeVisible(board.getIsLikeVisible())
                 .mentions(mentions)
                 .rankingScore(board.getRankingScore())
+                .isBookmark(bookMarkRepository.existsByMemberAndBoard(userDetails.getMember(), board))
                 .build();
     }
 
