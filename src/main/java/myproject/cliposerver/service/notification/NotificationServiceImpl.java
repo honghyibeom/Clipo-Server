@@ -84,16 +84,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public SseEmitter subscribe(String email) {
-
-//        if(!memberRepository.existsByEmail(email)) {
-//            throw new CustomException(ErrorCode.NOT_EQUALS_USER);
-//        }
-
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE); // 무한 유지
         emitters.put(email, emitter);
 
         emitter.onCompletion(() -> emitters.remove(email));
         emitter.onTimeout(() -> emitters.remove(email));
+        emitter.onError((e) -> emitters.remove(email));
 
         // 연결 확인을 위한 더미 데이터
         try {
@@ -142,5 +138,20 @@ public class NotificationServiceImpl implements NotificationService {
                 .message("해당 nno isRead 수정완료")
                 .body(unReadNumber)
                 .build();
+    }
+
+    @Override
+    public ResponseDTO disconnect(String email) {
+        SseEmitter emitter = emitters.remove(email);
+        if (emitter != null) {
+            emitter.complete();
+            return ResponseDTO.builder()
+                    .message("SSE 연결이 해제되었습니다.")
+                    .build();
+        } else {
+            return ResponseDTO.builder()
+                    .message("이미 해제되었거나 존재하지 않는 SSE 연결입니다.")
+                    .build();
+        }
     }
 }

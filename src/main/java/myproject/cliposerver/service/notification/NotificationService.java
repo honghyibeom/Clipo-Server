@@ -19,6 +19,8 @@ public interface NotificationService {
     ResponseDTO getUnRead(UserDetailsImpl userDetails);
     // unRead 수정
     ResponseDTO updateUnRead(UserDetailsImpl userDetails, Long nno);
+    // sse 구독 취소
+    ResponseDTO disconnect(String email);
 
 
 }

@@ -30,6 +30,12 @@ public class NotificationController {
         return notificationService.subscribe(email);
     }
 
+    @PostMapping("/subscribe/{email}/disconnect")
+    public ResponseEntity<ResponseDTO> disconnectNotification(@PathVariable String email) {
+        return ResponseEntity.ok(notificationService.disconnect(email));
+    }
+
+
     @Operation(summary = "최초 isRead 배열",description = "로그인시 읽지 않은 알림의 갯수 전달")
     @GetMapping(value = "/get/unRead")
     public ResponseEntity<ResponseDTO> getUnRead(@AuthenticationPrincipal UserDetailsImpl userDetails) {
