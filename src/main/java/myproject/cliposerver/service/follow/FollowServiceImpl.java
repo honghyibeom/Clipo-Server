@@ -7,10 +7,10 @@ import myproject.cliposerver.data.dto.PageResponseDTO;
 import myproject.cliposerver.data.dto.ResponseDTO;
 import myproject.cliposerver.data.dto.member.LittleUserInfoResponseDTO;
 import myproject.cliposerver.data.dto.notification.NoteInfoResponseDTO;
-import myproject.cliposerver.data.dto.notification.NoteInfoSSEDTO;
 import myproject.cliposerver.data.entity.Follow;
 import myproject.cliposerver.data.entity.Member;
 import myproject.cliposerver.data.entity.Notification;
+import myproject.cliposerver.data.enumerate.FollowEnum;
 import myproject.cliposerver.data.enumerate.NoteEnum;
 import myproject.cliposerver.exception.CustomException;
 import myproject.cliposerver.exception.ErrorCode;
@@ -84,48 +84,76 @@ public class FollowServiceImpl implements FollowService{
                 .build();
     }
 
-    @Override
-    public ResponseDTO getUserFollower(String username, int page, UserDetailsImpl userDetails) {
+//    @Override
+//    public ResponseDTO getUserFollower(String username, int page, UserDetailsImpl userDetails) {
+//
+//        Member member = memberRepository.findByName(username)
+//                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+//
+//        PageRequest pageRequest = PageRequest.of(page, 10);
+//        Page<Follow> followingPage = followRepository.findByToMember(member,pageRequest);
+//        PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followingPage, FollowEnum.FOLLOWING);
+//
+//        return ResponseDTO.builder()
+//                .message("팔로워 조회")
+//                .body(response)
+//                .build();
+//    }
+//
+//    @Override
+//    public ResponseDTO getUserFollowing(String username, int page, UserDetailsImpl userDetails) {
+//
+//        Member member = memberRepository.findByName(username)
+//                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+//
+//        PageRequest pageRequest = PageRequest.of(page, 10);
+//        Page<Follow> followerPage = followRepository.findByFromMember(member,pageRequest);
+//        PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followerPage);
+//
+//        return ResponseDTO.builder()
+//                .message("팔로잉 조회")
+//                .body(response)
+//                .build();
+//    }
+//
+@Override
+public ResponseDTO getUserFollow(String username, int page, UserDetailsImpl userDetails, FollowEnum followEnum) {
 
-        Member member = memberRepository.findByName(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+    Member member = memberRepository.findByName(username)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
-        PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Follow> followingPage = followRepository.findByToMember(member,pageRequest);
-        PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followingPage);
+    PageRequest pageRequest = PageRequest.of(page, 10);
 
-        return ResponseDTO.builder()
-                .message("팔로워 조회")
-                .body(response)
-                .build();
+    Page<Follow> followPage;
+
+    if (followEnum == FollowEnum.FOLLOWER) {
+        followPage = followRepository.findByToMember(member,pageRequest);
     }
-
-    @Override
-    public ResponseDTO getUserFollowing(String username, int page, UserDetailsImpl userDetails) {
-
-        Member member = memberRepository.findByName(username)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
-
-        PageRequest pageRequest = PageRequest.of(page, 10);
-        Page<Follow> followerPage = followRepository.findByFromMember(member,pageRequest);
-        PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followerPage);
-
-        return ResponseDTO.builder()
-                .message("팔로잉 조회")
-                .body(response)
-                .build();
+    else {
+        followPage = followRepository.findByFromMember(member,pageRequest);
     }
+    PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followPage, followEnum);
 
-    private PageResponseDTO<LittleUserInfoResponseDTO> getUserInfo(UserDetailsImpl userDetails, Member member, Page<Follow> followerPage) {
+    return ResponseDTO.builder()
+            .message(followEnum == FollowEnum.FOLLOWER ? "팔로워 조회" : "팔로잉 조회")
+            .body(response)
+            .build();
+}
+
+    private PageResponseDTO<LittleUserInfoResponseDTO> getUserInfo(UserDetailsImpl userDetails, Member member,
+                                                                   Page<Follow> followerPage, FollowEnum followEnum) {
         List<Follow> result = followerPage.getContent();
 
-        List<LittleUserInfoResponseDTO> responseList = result.stream().map(follow ->
-                LittleUserInfoResponseDTO.builder()
-                        .profilePicture(follow.getFromMember().getProfileImage())
-                        .nickName(follow.getFromMember().getName())
-                        .email(follow.getFromMember().getEmail())
-                        .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(),member))
-                        .build()
+        List<LittleUserInfoResponseDTO> responseList = result.stream()
+                .map(follow -> {
+                    Member info = (followEnum == FollowEnum.FOLLOWER ? follow.getFromMember() : follow.getToMember());
+                    return LittleUserInfoResponseDTO.builder()
+                            .profilePicture(info.getProfileImage())
+                            .nickName(info.getName())
+                            .email(info.getEmail())
+                            .isFollowing(followRepository.existsByFromMemberAndToMember(userDetails.getMember(),member))
+                            .build();
+                }
         ).toList();
 
         return PageResponseDTO.<LittleUserInfoResponseDTO>builder()
@@ -135,6 +163,7 @@ public class FollowServiceImpl implements FollowService{
                 .hasPrev(followerPage.hasPrevious())
                 .build();
     }
+
 
     private void insertNotification(Member toMember, UserDetailsImpl userDetails) {
 

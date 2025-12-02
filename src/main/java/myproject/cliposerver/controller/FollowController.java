@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import myproject.cliposerver.config.security.UserDetailsImpl;
 import myproject.cliposerver.data.dto.ResponseDTO;
+import myproject.cliposerver.data.enumerate.FollowEnum;
 import myproject.cliposerver.service.follow.FollowService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,12 +32,12 @@ public class FollowController {
         return ResponseEntity.ok(followService.unfollow(toMemberUsername, userDetails));
     }
 
-    @Operation(summary = "팔로우 조회 리스트",description = "팔로우 조회 리스트 api")
+    @Operation(summary = "팔로워 조회 리스트",description = "팔로워 조회 리스트 api")
     @GetMapping("/get/users/{username}/follower/{page}")
     public ResponseEntity<ResponseDTO> getFollow(@PathVariable("username") String username,
                                                  @PathVariable("page") int page,
                                                 @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(followService.getUserFollower(username,page,userDetails));
+        return ResponseEntity.ok(followService.getUserFollow(username,page,userDetails, FollowEnum.FOLLOWER));
     }
 
     @Operation(summary = "팔로잉 조회 리스트",description = "팔로잉 조회 리스트 api")
@@ -44,6 +45,6 @@ public class FollowController {
     public ResponseEntity<ResponseDTO> getFollowing(@PathVariable("username") String username,
                                                     @PathVariable("page") int page,
                                                     @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return ResponseEntity.ok(followService.getUserFollowing(username,page,userDetails));
+        return ResponseEntity.ok(followService.getUserFollow(username,page,userDetails, FollowEnum.FOLLOWING));
     }
 }

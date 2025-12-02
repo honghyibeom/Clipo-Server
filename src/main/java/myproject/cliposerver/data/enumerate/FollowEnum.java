@@ -5,10 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum MessageType {
-    TEXT("TEXT"),
-    IMAGE("IMAGE"),
-    SYSTEM("SYSTEM");
-
+public enum FollowEnum {
+    FOLLOWER("FOLLOWER"),
+    FOLLOWING("FOLLOWING"),;
     private final String type;
+
 }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookMarkRepository extends JpaRepository<Bookmark, Long> {
@@ -19,4 +20,6 @@ public interface BookMarkRepository extends JpaRepository<Bookmark, Long> {
     Page<Bookmark> findByMember(Member member, Pageable pageable);
 
     Page<Bookmark> getBookmarkByBoard_Bno(Long bno, Pageable pageable);
+    // 북마크 찾기
+    Optional<Bookmark> findByMemberAndBoard(Member member, Board board);
 }

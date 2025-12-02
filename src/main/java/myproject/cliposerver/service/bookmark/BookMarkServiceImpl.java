@@ -47,10 +47,10 @@ public class BookMarkServiceImpl implements BookmarkService {
         Board board = boardRepository.findByBno(bno)
                 .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
 
-        bookmarkRepository.findAll().stream()
-                .filter(b -> b.getMember().equals(userDetails.getMember()) && b.getBoard().equals(board))
-                .findFirst()
-                .ifPresent(bookmarkRepository::delete);
+        Bookmark bookmark = bookmarkRepository.findByMemberAndBoard(userDetails.getMember(), board)
+                .orElseThrow(()-> new CustomException(ErrorCode.NOT_EXIST_BOARD));
+
+        bookmarkRepository.delete(bookmark);
 
         return ResponseDTO.builder()
                 .message("북마크 취소 완료")
