@@ -116,29 +116,29 @@ public class FollowServiceImpl implements FollowService{
 //                .build();
 //    }
 //
-@Override
-public ResponseDTO getUserFollow(String username, int page, UserDetailsImpl userDetails, FollowEnum followEnum) {
+    @Override
+    public ResponseDTO getUserFollow(String username, int page, UserDetailsImpl userDetails, FollowEnum followEnum) {
 
-    Member member = memberRepository.findByName(username)
-            .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
+        Member member = memberRepository.findByName(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST_USER));
 
-    PageRequest pageRequest = PageRequest.of(page, 10);
+        PageRequest pageRequest = PageRequest.of(page, 10);
 
-    Page<Follow> followPage;
+        Page<Follow> followPage;
 
-    if (followEnum == FollowEnum.FOLLOWER) {
-        followPage = followRepository.findByToMember(member,pageRequest);
+        if (followEnum == FollowEnum.FOLLOWER) {
+            followPage = followRepository.findByToMember(member,pageRequest);
+        }
+        else {
+            followPage = followRepository.findByFromMember(member,pageRequest);
+        }
+        PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followPage, followEnum);
+
+        return ResponseDTO.builder()
+                .message(followEnum == FollowEnum.FOLLOWER ? "팔로워 조회" : "팔로잉 조회")
+                .body(response)
+                .build();
     }
-    else {
-        followPage = followRepository.findByFromMember(member,pageRequest);
-    }
-    PageResponseDTO<LittleUserInfoResponseDTO> response = getUserInfo(userDetails, member, followPage, followEnum);
-
-    return ResponseDTO.builder()
-            .message(followEnum == FollowEnum.FOLLOWER ? "팔로워 조회" : "팔로잉 조회")
-            .body(response)
-            .build();
-}
 
     private PageResponseDTO<LittleUserInfoResponseDTO> getUserInfo(UserDetailsImpl userDetails, Member member,
                                                                    Page<Follow> followerPage, FollowEnum followEnum) {

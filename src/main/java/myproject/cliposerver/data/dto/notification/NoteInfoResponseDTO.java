@@ -14,6 +14,7 @@ public class NoteInfoResponseDTO {
     private String from;
     private Long bno;
     private Long rno;
+    private Long parentRno;
     private Boolean isFollowing;
     private Boolean isRead;
     private LocalDateTime createAt;

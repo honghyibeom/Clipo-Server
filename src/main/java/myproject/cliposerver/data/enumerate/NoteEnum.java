@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum NoteEnum {
     board("board"),
     reply("reply"),
+    nestRe("nestRe"),
     like("like"),
     longtime("longtime"),
     follow("follow"),

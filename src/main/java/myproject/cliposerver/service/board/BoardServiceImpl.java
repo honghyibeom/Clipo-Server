@@ -226,6 +226,7 @@ public class BoardServiceImpl implements BoardService {
                     .numberOfComments(replyRepository.countByParent(reply))
                     .contents(reply.getText())
                     .regDate(String.valueOf(reply.getRegDate()))
+                    .parentRno(reply.getParent() != null ? reply.getParent().getRno() : null)
                     .isLike(replyLikeRepository.existsByReplyAndMember(reply, userDetails.getMember()))
                     .mentions(mentions)
                     .build();

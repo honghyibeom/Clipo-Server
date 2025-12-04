@@ -345,20 +345,20 @@ public class ReplyServiceImpl implements ReplyService {
             }
         }
         // 대댓글
-//        else {
-//            Member parentReplyWriter = reply.getParent().getWriter();
-//            if (!parentReplyWriter.getEmail().equals(sender.getEmail())) {
-//                notifications.add(Notification.builder()
-//                        .type(NoteEnum.reply)
-//                        .sender(sender)
-//                        .receiver(parentReplyWriter)
-//                        .board(reply.getBoard())
-//                        .reply(reply)
-//                        .isRead(false)
-//                        .createdAt(now)
-//                        .build());
-//            }
-//        }
+        else {
+            Member parentReplyWriter = reply.getParent().getWriter();
+            if (!parentReplyWriter.getEmail().equals(sender.getEmail())) {
+                notifications.add(Notification.builder()
+                        .type(NoteEnum.nestRe)
+                        .sender(sender)
+                        .receiver(parentReplyWriter)
+                        .board(reply.getBoard())
+                        .reply(reply)
+                        .isRead(false)
+                        .createdAt(now)
+                        .build());
+            }
+        }
 
         // [2] 멘션된 사용자
         if (mentions != null) {
@@ -375,6 +375,7 @@ public class ReplyServiceImpl implements ReplyService {
                             .bno(note.getBoard().getBno())
                             .boardOneImage(null)
                             .rno(reply.getRno())
+                            .parentRno(note.getType().equals(NoteEnum.nestRe) ? reply.getParent().getRno() : null)
                             .email(sender.getEmail())
                             .from(sender.getName())
                             .userProfileImage(sender.getProfileImage())
