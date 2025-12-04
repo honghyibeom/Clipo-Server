@@ -375,7 +375,7 @@ public class ReplyServiceImpl implements ReplyService {
                             .bno(note.getBoard().getBno())
                             .boardOneImage(null)
                             .rno(reply.getRno())
-                            .parentRno(note.getType().equals(NoteEnum.nestRe) ? reply.getParent().getRno() : null)
+                            .parentRno(reply.getParent() != null ? reply.getParent().getRno() : null)
                             .email(sender.getEmail())
                             .from(sender.getName())
                             .userProfileImage(sender.getProfileImage())
