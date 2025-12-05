@@ -55,6 +55,8 @@ public class NotificationServiceImpl implements NotificationService {
                                 ? noti.getBoard().getBoardImageList().get(0).getSrc()
                                 : null)
                         .rno(noti.getReply() != null ? noti.getReply().getRno() : null)
+                        .parentRno(noti.getReply() != null ? noti.getReply().getParent() != null ?
+                                noti.getReply().getParent().getRno() : null : null)
                         .email(noti.getSender().getEmail())
                         .from(noti.getSender().getName())
                         .userProfileImage(noti.getSender().getProfileImage())
