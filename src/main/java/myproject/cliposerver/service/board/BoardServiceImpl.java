@@ -217,7 +217,7 @@ public class BoardServiceImpl implements BoardService {
             return ReplyInfoResponseDTO.builder()
                     .bno(reply.getBoard().getBno())
                     .rno(reply.getRno())
-                    .typeOfPost(reply.getParent() != null ? TypeOfPost.reply.name() : TypeOfPost.nestRe.name())
+                    .typeOfPost(reply.getParent() == null ? TypeOfPost.reply.name() : TypeOfPost.nestRe.name())
                     .email(reply.getWriter().getEmail())
                     .nickName(reply.getWriter().getName())
                     .profilePicture(reply.getWriter().getProfileImage())
