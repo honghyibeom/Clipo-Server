@@ -7,6 +7,15 @@ plugins {
 group = 'myProject'
 version = '0.0.1-SNAPSHOT'
 
+bootJar {
+    archiveFileName = "cliposerver.jar"
+}
+
+jar {
+    enabled = false
+}
+
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
