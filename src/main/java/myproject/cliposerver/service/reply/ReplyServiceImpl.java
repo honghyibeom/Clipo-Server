@@ -66,7 +66,8 @@ public class ReplyServiceImpl implements ReplyService {
             boardRepository.save(board);
 
             //알림 생성
-            insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
+            insertReplyCreateNotification(userDetails.getMember(), reply);
+            insertReplyMentionNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
 
             return ResponseDTO.builder()
                     .message("자식 댓글 생성 완료")
@@ -87,7 +88,8 @@ public class ReplyServiceImpl implements ReplyService {
             boardRepository.save(board);
 
             //알림 생성
-            insertReplyCreateNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
+            insertReplyCreateNotification(userDetails.getMember(), reply);
+            insertReplyMentionNotification(userDetails.getMember(), reply, replyRequestDTO.getMentions());
 
             return ResponseDTO.builder()
                     .message("댓글 생성 완료")
@@ -325,7 +327,7 @@ public class ReplyServiceImpl implements ReplyService {
         }
     }
 
-    private void insertReplyCreateNotification(Member sender, Reply reply, List<String> mentions) {
+    private void insertReplyCreateNotification(Member sender, Reply reply) {
         List<Notification> notifications = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
@@ -360,11 +362,6 @@ public class ReplyServiceImpl implements ReplyService {
             }
         }
 
-        // [2] 멘션된 사용자
-        if (mentions != null) {
-            insertReplyEditNotification(sender, reply, mentions);
-        }
-
         // 저장 및 SSE 전송
         notificationRepository.saveAll(notifications);
         notifications.forEach(note -> {
@@ -386,14 +383,20 @@ public class ReplyServiceImpl implements ReplyService {
         });
     }
 
-    private void insertReplyEditNotification(Member sender, Reply reply, List<String> mentions) {
+    private void insertReplyMentionNotification(Member sender, Reply reply, List<String> mentions) {
         if (mentions == null || mentions.isEmpty()) return;
 
         List<Notification> notifications = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
-        for (String email : mentions) {
-            memberRepository.findByEmail(email).ifPresent(mentionedUser -> {
+
+        for (String nickName : mentions) {
+            nickName = nickName.trim();
+            if (nickName.startsWith("@")) {
+                nickName = nickName.substring(1);
+            }
+
+            memberRepository.findByName(nickName).ifPresent(mentionedUser -> {
                 if (!mentionedUser.getEmail().equals(sender.getEmail())) {
                     notifications.add(Notification.builder()
                             .type(NoteEnum.mention)
@@ -409,6 +412,7 @@ public class ReplyServiceImpl implements ReplyService {
         }
 
         notificationRepository.saveAll(notifications);
+
         notifications.forEach(note -> {
             notificationService.sendNotification(note.getReceiver().getEmail(),
                     NoteInfoResponseDTO.builder()
