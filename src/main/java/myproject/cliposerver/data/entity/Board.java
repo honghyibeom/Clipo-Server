@@ -21,7 +21,7 @@ public class Board extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "userInfo")
     private Member member;
-    @Column(nullable = false)
+    @Column
     private String content;
     @Column(nullable = false)
     private Boolean isLikeVisible;
