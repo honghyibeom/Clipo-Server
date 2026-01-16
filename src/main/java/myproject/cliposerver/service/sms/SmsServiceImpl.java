@@ -50,13 +50,14 @@ public class SmsServiceImpl implements SmsService {
 
         member.changeValidate(true);
         member.changePhone(requestDto.getPhone());
-        memberRepository.save(member);
 
         String accessToken = jwtTokenUtil.createToken(member);
         String refreshToken = jwtTokenUtil.createRefreshToken();
 
         member.changeToken(accessToken, refreshToken);
         member.changeLastLoginAt(LocalDateTime.now());
+
+        memberRepository.save(member);
 
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
